@@ -1,6 +1,10 @@
 {
   "name": "@charlescol/schema-registry",
   "version": "1.0.0",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "main": "lib/index.js",
   "repository": "git@github.com:QuantaPred/schemas-registry.git",
   "author": "charlescol <charlescol@hotmail.fr>",
