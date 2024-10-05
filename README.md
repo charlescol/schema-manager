@@ -113,6 +113,8 @@ The `subjectBuilder` function is responsible for generating the subject name for
 
 **Example Subject Names:**
 
+The function above generates the following subject names:
+
 - `v1/data.proto` → `data.v1`
 - `v1/model.proto` → `model.v1`
 - `v2/data.proto` → `data.v2`
