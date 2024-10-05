@@ -1,0 +1,49 @@
+name: Publish to npm on tag
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22' 
+
+      - name: Install dependencies with Yarn
+        run: yarn install
+
+      # Extract the version from the tag
+      - name: Extract tag version
+        id: extract_tag_version
+        run: |
+          echo "Tag is $GITHUB_REF"
+          TAG_VERSION=$(echo "${GITHUB_REF##*/}" | sed 's/v//')
+          echo "TAG_VERSION=$TAG_VERSION" >> $GITHUB_ENV 
+      
+      # Ensure the tag version matches the version in package.json
+      - name: Ensure tag matches version in package.json
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          
+          if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
+            echo "Version mismatch: Tag version ($TAG_VERSION) doesn't match package.json version ($PACKAGE_VERSION)"
+            exit 1
+          fi
+        shell: bash
+        env:
+          TAG_VERSION: ${{ env.TAG_VERSION }}  
+
+      # Publish to npm using Yarn
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: yarn publish --new-version ${{ env.TAG_VERSION }} --non-interactive
