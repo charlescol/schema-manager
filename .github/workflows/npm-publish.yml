@@ -45,5 +45,7 @@ jobs:
       # Publish to npm using Yarn
       - name: Publish to npm
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn publish --new-version ${{ env.TAG_VERSION }} --non-interactive
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  
+        run: |
+          echo "NODE_AUTH_TOKEN is: $NODE_AUTH_TOKEN"  
+          yarn publish --new-version ${{ env.TAG_VERSION }} --non-interactive
