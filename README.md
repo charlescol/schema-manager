@@ -4,9 +4,11 @@
 
 ### Introduction
 
-Managing schema files in distributed systems like microservices or event-driven architectures (e.g., Kafka, gRPC) can be complex and error-prone. Schema Manager simplifies this by automating schema versioning, resolving dependencies, and registering schemas in a schema registry (such as Confluent Schema Registry).
+In modern microservices architectures, separating concerns is critical for scalability and maintainability. Managing schema files (e.g., Protobuf) across services can become complex and error-prone, especially when each microservice is responsible for publishing schemas to a schema registry (e.g., Confluent Schema Registry).
 
-With Schema Manager, you can centralize all your schema files in one repository, and automate their publication while ensuring that dependencies are handled correctly. It also standardizes version management across services, making schema lifecycle management easier and more reliable.
+Schema Manager solves this by centralizing schema management and delegation. Instead of allowing microservices to handle schema publication directly, Schema Manager automates the versioning, dependency resolution, and registration of schemas in a centralized repository. This approach keeps microservices lightweight, while Schema Manager handles all the complexity of schema registration and lifecycle management.
+
+By enforcing this separation of concerns, Schema Manager simplifies schema management across services, making the system more scalable, consistent, and reliable.
 
 ### Quick Start
 
