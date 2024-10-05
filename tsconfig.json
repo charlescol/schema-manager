@@ -3,6 +3,7 @@
     "module": "commonjs",
     "project": "tsconfig.json",
     "declaration": true,
+    "declarationDir": "./dist",
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

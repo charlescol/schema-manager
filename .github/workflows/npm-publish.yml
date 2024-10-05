@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies with Yarn
         run: yarn install
 
+      - name: Build project
+        run: yarn build  
+
       # Extract the version from the tag
       - name: Extract tag version
         id: extract_tag_version
