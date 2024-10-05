@@ -41,11 +41,14 @@ jobs:
         shell: bash
         env:
           TAG_VERSION: ${{ env.TAG_VERSION }}  
+      
+      - name: Configure npm authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       # Publish to npm using Yarn
       - name: Publish to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}  
         run: |
-          echo "NODE_AUTH_TOKEN is: $NODE_AUTH_TOKEN"  
           yarn publish --new-version ${{ env.TAG_VERSION }} --non-interactive
