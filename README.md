@@ -98,7 +98,7 @@ const baseDirectory = './example-schemas';
 // This is an example implementation, you can customize it based on your own versioning and naming rules.
 const subjectBuilder = (versions: string[], filepath: string): string => {
   const minVersion = versions.sort()[0]; // Select the minimum version
-  return (s
+  return (
     filepath
       .replace(/\/v\d+/, '') // Remove the version directory (e.g., /v1)
       .replace(/\.proto$/, '') // Remove the .proto file extension
