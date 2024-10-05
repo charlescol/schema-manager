@@ -1,0 +1,22 @@
+{
+  "name": "schemas-registry",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "repository": "git@github.com:QuantaPred/schemas-registry.git",
+  "author": "charlescol <charlescol@hotmail.fr>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "publish-schemas": "yarn build && node dist/publish-schemas.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "protobufjs": "^7.4.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^22.5.5",
+    "typescript": "^5.6.2"
+  }
+}
