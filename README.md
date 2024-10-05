@@ -94,7 +94,8 @@ const schemaRegistry = new ProtoSchemaRegistry({
 
 const baseDirectory = './example-schemas';
 
-// Function to build the subject using the minimum version
+// Function to provide, used to build the subject using the minimum version
+// This is an example implementation, you can customize it based on your own versioning and naming rules.
 const subjectBuilder = (versions: string[], filepath: string): string => {
   const minVersion = versions.sort()[0]; // Select the minimum version
   return (
