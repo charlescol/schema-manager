@@ -25,6 +25,10 @@ If you've found a bug, or you have an idea for a feature or improvement, please 
 4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you
    do not have permission to do that, you may request the second reviewer to merge it for you.
 
+## Setting up the Development Environment
+
+This project uses Yarn for package management, so please ensure you have Yarn installed before proceeding.
+
 ## Code Style and Formatting:
 
 We use ESLint for code linting and Prettier for code formatting. Before submitting your changes, make sure that your code follows these standards.
