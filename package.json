@@ -1,5 +1,5 @@
 {
-  "name": "@charlescol/schema-registry",
+  "name": "@charlescol/schema-manager",
   "version": "1.0.0",
   "publishConfig": {
     "access": "public",
