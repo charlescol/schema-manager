@@ -28,6 +28,6 @@
     "allowJs": false,
     "noEmit": false
   },
-  "exclude": ["wwwroot"],
+  "exclude": ["wwwroot", "lib/main.ts"],
   "include": ["lib/**/*", "schemas/**/*"]
 }
