@@ -11,8 +11,6 @@ import axios from 'axios';
 import AbstractSchemaRegistry from './schema-registry';
 import { SchemaType } from './types';
 
-const SCHEMA_REGISTRY_URL = 'http://localhost:8081';
-const SCHEMA_DIR = path.resolve(__dirname, '../schemas');
 /**
  * Class for managing and registering Protobuf schemas with a schema registry.
  *
@@ -111,16 +109,3 @@ export default class ProtoSchemaRegistry extends AbstractSchemaRegistry {
     return references;
   }
 }
-
-(async () => {
-  const registry = new ProtoSchemaRegistry({ schemaRegistryUrl: SCHEMA_REGISTRY_URL });
-  await registry.loadAll(SCHEMA_DIR, (versions: string[], filepath: string): string => {
-    const minVersion = versions.sort()[0];
-    return (
-      filepath
-        .replace(/\/v\d+/, '')
-        .replace(/\.proto$/, '')
-        .replace(/[/\\]/g, '.') + `.${minVersion}`
-    );
-  });
-})();

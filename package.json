@@ -12,7 +12,8 @@
   "license": "MIT",
   "scripts": {
     "build": "yarn tsc",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "run:protobuf": "yarn ts-node ./lib/main.ts --preset=protobuf"
   },
   "dependencies": {
     "axios": "^1.7.7",
@@ -20,7 +21,10 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/minimist": "^1.2.5",
     "@types/node": "^22.5.5",
+    "minimist": "^1.2.8",
+    "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   },
   "files": [

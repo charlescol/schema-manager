@@ -1,0 +1,10 @@
+{
+  "v1": {
+    "data.proto": "v1/data.proto",
+    "model.proto": "v1/model.proto"
+  },
+  "v2": {
+    "data.proto": "v2/data.proto",
+    "model.proto": "v1/model.proto"
+  }
+}

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package topic1.v2;
+
+import "model.proto";
+
+message Data {
+  topic1.v1.Model model = 1; // Now referencing model.proto from v1
+  string additional_info = 2;
+}

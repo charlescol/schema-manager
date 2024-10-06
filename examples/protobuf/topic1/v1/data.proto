@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package topic1.v1;
+
+// Message defining some basic data structure for v1 of topic1
+message Data {
+  string id = 1;
+  string name = 2;
+  int32 age = 3;
+}

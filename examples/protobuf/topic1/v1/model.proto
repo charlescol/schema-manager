@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package topic1.v1;
+
+import "data.proto";
+
+// Message that uses Data from v1/data.proto
+message Model {
+  Data data = 1; // Reference to the Data message from data.proto
+  string description = 2;
+  repeated string tags = 3;
+}
