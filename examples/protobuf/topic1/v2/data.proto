@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package topic1.v2;
+package topic1;
 
 message Data {
   string additional_info = 1;

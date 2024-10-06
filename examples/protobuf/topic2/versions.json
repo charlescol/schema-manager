@@ -3,6 +3,7 @@
     "data2.proto": "v1/data2.proto"
   },
   "test2": {
-    "data.proto": "v2/data.proto"
+    "data.proto": "v2/data.proto",
+    "data2.proto": "v1/data2.proto"
   }
 }

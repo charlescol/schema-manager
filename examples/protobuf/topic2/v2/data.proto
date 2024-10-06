@@ -1,10 +1,11 @@
 syntax = "proto3";
 
-package topic2.v2;
+package topic2;
 
-// Updated schema for v2 (or test2) of topic2
+import "data2.proto";
+
 message Data {
   string id = 1;
-  repeated Data2 related_data = 2; // Reference to the Data2 message from topic2 v1
+  repeated topic2.Data2 related_data = 2; 
   bool is_active = 3;
 }

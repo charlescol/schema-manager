@@ -13,11 +13,12 @@
   "scripts": {
     "build": "yarn tsc",
     "clean": "rm -rf dist",
-    "run:protobuf": "yarn ts-node ./lib/main.ts --preset=protobuf"
+    "run:protobuf": "yarn ts-node -r tsconfig-paths/register ./lib/main.ts --preset=protobuf"
   },
   "dependencies": {
     "axios": "^1.7.7",
-    "protobufjs": "^7.4.0"
+    "protobufjs": "^7.4.0",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",

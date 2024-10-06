@@ -1,48 +1,17 @@
-// import axios from 'axios';
-import * as fs from 'fs';
 import * as path from 'path';
-import extractVersionsData from './utils/extract-versions-data';
+import * as fs from 'fs';
+import AbstractParser from '@src/parser/abstract-parser';
+import AbstractRegistry from '@src/registry/abstract-registry';
+import { NamespaceMap, Reference } from '@src/utils/types';
+import VersionsDataExtractor from '@src/versions-data-extractor/version-data-extractor';
+import topologicalSort from '@src/utils/topological-sort';
 
-import processProtobufFiles from './utils/parse-protobuf-dependencies';
-import topologicalSort from './utils/topological-sort';
+export default class Manager {
+  protected readonly versionDataExtractor: VersionsDataExtractor;
 
-import { NamespaceMap, Reference } from './utils/types';
-import axios from 'axios';
-import AbstractSchemaRegistry from './schema-registry';
-import { SchemaType } from './types';
-
-/**
- * Class for managing and registering Protobuf schemas with a schema registry.
- *
- * This class is responsible for loading,
- * processing, and registering `.proto` files with a schema registry. It supports
- * registering schemas with their respective dependencies (other `.proto` files),
- * and handles registering them in a topologically sorted order to ensure that all
- * dependencies are resolved correctly.
- */
-export default class ProtoSchemaRegistry extends AbstractSchemaRegistry {
-  private async registerProtoSchema(subject: string, protobufSchema: string, references: Reference[]): Promise<object> {
-    try {
-      const response = await axios.post(
-        `${this.config.schemaRegistryUrl}/subjects/${subject}/versions`,
-        {
-          schemaType: SchemaType.PROTOBUF,
-          schema: protobufSchema,
-          references,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-      return response.data;
-    } catch (error) {
-      console.error(`Failed to register proto schema for subject ${subject}`, error);
-      throw error;
-    }
+  constructor(protected readonly schemaRegistry: AbstractRegistry, protected readonly parser: AbstractParser) {
+    this.versionDataExtractor = new VersionsDataExtractor();
   }
-
   /**
    * Loads all Protobuf schemas from the specified directory, processes them, and registers them
    * with the schema registry in topologically sorted order.
@@ -62,8 +31,8 @@ export default class ProtoSchemaRegistry extends AbstractSchemaRegistry {
     baseDirectory: string,
     subjectBuilder: (versions: string[], filepath: string) => string,
   ): Promise<void> {
-    const versionsResolution = await extractVersionsData(baseDirectory);
-    const dependenciesResult = processProtobufFiles(versionsResolution, baseDirectory);
+    const versionsResolution = await this.versionDataExtractor.extract(baseDirectory);
+    const dependenciesResult = this.parser.parse(versionsResolution, baseDirectory);
     const order = topologicalSort(dependenciesResult.dependenciesMap);
 
     const subjects = new Map<string, string>();
@@ -83,7 +52,7 @@ export default class ProtoSchemaRegistry extends AbstractSchemaRegistry {
         filepath,
       );
       subjects.set(filepath, formattedSubject);
-      await this.registerProtoSchema(formattedSubject, protoContent, references);
+      await this.schemaRegistry.registerSchema(formattedSubject, protoContent, references);
       console.log(`Registered proto schema for ${formattedSubject}`);
     }
   }
