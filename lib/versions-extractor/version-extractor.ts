@@ -1,11 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as util from 'util';
-
 import { FileMap, VersionData, VersionMap } from './types';
-
-const readdir = util.promisify(fs.readdir);
-const readFile = util.promisify(fs.readFile);
 
 export default class VersionsExtractor {
   private baseDirectory: string;
@@ -78,7 +73,7 @@ export default class VersionsExtractor {
    * @returns {Promise<void>}
    */
   private async processDirectory(currentPath: string, versionMap: VersionMap, fileMap: FileMap): Promise<void> {
-    const entries = await readdir(currentPath, { withFileTypes: true });
+    const entries = await fs.promises.readdir(currentPath, { withFileTypes: true });
     for (const entry of entries) {
       const absolutePath = path.join(currentPath, entry.name);
       if (entry.isDirectory()) {
@@ -99,7 +94,7 @@ export default class VersionsExtractor {
    * @returns {Promise<void>}
    */
   private async processFile(filePath: string, versionMap: VersionMap, fileMap: FileMap): Promise<void> {
-    const data: VersionData = JSON.parse(await readFile(filePath, 'utf8'));
+    const data: VersionData = JSON.parse(await fs.promises.readFile(filePath, 'utf8'));
     const directoryPath = path.dirname(filePath);
     const relativeDirectoryPath = path.relative(this.baseDirectory, directoryPath);
     for (const [version, files] of Object.entries(data)) {
