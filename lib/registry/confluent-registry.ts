@@ -2,7 +2,7 @@ import axios from 'axios';
 import { SchemaType } from '../types';
 import AbstractRegistry from './abstract-registry';
 import { ConfluentRegistryReference } from './types';
-import { DependenciesMap, NamespaceMap } from '@src/parser/types';
+import { DependenciesMap, NamespaceMap } from '../parser/types';
 
 export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistryReference> {
   async registerSchema(subject: string, schema: string, references: ConfluentRegistryReference[]): Promise<object> {

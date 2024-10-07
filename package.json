@@ -11,7 +11,7 @@
   "author": "charlescol <charlescol@hotmail.fr>",
   "license": "MIT",
   "scripts": {
-    "build": "yarn tsc",
+    "build": "rm -rf dist && yarn tsc",
     "clean": "rm -rf dist",
     "run:protobuf": "yarn ts-node -r tsconfig-paths/register ./lib/main.ts --preset=protobuf"
   },

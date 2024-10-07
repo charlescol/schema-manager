@@ -1,5 +1,5 @@
-import { DependenciesMap, NamespaceMap } from '@src/parser/types';
-import { ConfluentRegistryReference, RegistryConfig } from './types';
+import { DependenciesMap, NamespaceMap } from '../parser/types';
+import { RegistryConfig } from './types';
 
 export default abstract class AbstractRegistry<TRef> {
   constructor(protected readonly config: RegistryConfig) {}

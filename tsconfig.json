@@ -21,16 +21,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "baseUrl": "./",
-    "paths": {
-      "@schemas/*": ["schemas/*"],
-      "@src/*": ["lib/*"],
-      "@utils/*": ["lib/utils/*"],
-      "@manager/*": ["lib/manager/*"],
-      "@registry/*": ["lib/registry/*"],
-      "@parser/*": ["lib/parser/*"]
-    },
-    "allowJs": false,
-    "noEmit": false
+    "allowJs": false
   },
   "exclude": ["wwwroot", "lib/main.ts"],
   "include": ["lib/**/*", "schemas/**/*"]

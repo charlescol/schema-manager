@@ -1,10 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import AbstractParser from '@src/parser/abstract-parser';
-import AbstractRegistry from '@src/registry/abstract-registry';
-
-import topologicalSort from '@src/utils/topological-sort';
-import VersionsExtractor from '@src/versions-extractor/version-extractor';
+import AbstractParser from '../parser/abstract-parser';
+import AbstractRegistry from '../registry/abstract-registry';
+import topologicalSort from '../utils/topological-sort';
+import VersionsExtractor from '../versions-extractor/version-extractor';
 
 export default class Manager {
   protected readonly versionDataExtractor: VersionsExtractor;
