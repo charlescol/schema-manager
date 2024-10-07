@@ -85,14 +85,15 @@ example-schemas/
 ### Usage Example
 
 ```typescript
-import ProtoSchemaRegistry from '@scharlescol/schema-manager';
+import { ConfluentRegistry, Manager, ProtobufParser } from '@charlescol/schema-manager';
+import * as path from 'path';
 
-// Configuration for Schema Manager
-const schemaRegistry = new ProtoSchemaRegistry({
+const registry = new ConfluentRegistry({
   schemaRegistryUrl: 'http://localhost:8081',
 });
+const baseDirectory = path.resolve(__dirname, '../schemas');
 
-const baseDirectory = './example-schemas';
+const manager = new Manager(registry, new ProtobufParser());
 
 // Function to provide, used to build the subject for each schema file.
 // This is an example implementation, you can customize it based on your own versioning and naming rules.
@@ -106,7 +107,7 @@ const subjectBuilder = (versions: string[], filepath: string): string => {
   );
 };
 // Load and register all schemas
-schemaRegistry.loadAll(baseDirectory, subjectBuilder);
+await manager.loadAll(baseDirectory, subjectBuilder);
 ```
 
 The `subjectBuilder` function is responsible for generating the subject name for each schema that is registered in the schema registry. The subject is a unique identifier used by the registry to track schema versions and manage updates. The function takes two parameters:
