@@ -1,11 +1,9 @@
 import * as path from 'path';
 import * as minimist from 'minimist';
-import ConfluentRegistry from './registry/confluent-registry';
-import AbstractRegistry from './registry/abstract-registry';
-import Manager from './manager/manager';
-import ProtobufParser from './parser/protobuf-parser';
-import AbstractParser from './parser/abstract-parser';
-import manager from './manager/manager';
+import ConfluentRegistry from '../dist/registry/confluent-registry';
+import Manager from '../dist/manager/manager';
+import ProtobufParser from '../dist/parser/protobuf-parser';
+import AbstractParser from '../dist/parser/abstract-parser';
 
 (async () => {
   let parser: AbstractParser;
