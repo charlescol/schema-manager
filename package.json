@@ -16,7 +16,8 @@
   "scripts": {
     "build": "rm -rf dist && yarn tsc",
     "clean": "rm -rf dist",
-    "run:protobuf": "yarn build && yarn ts-node -r tsconfig-paths/register ./lib/main.ts --preset=protobuf"
+    "run": "yarn build && yarn ts-node -r tsconfig-paths/register ./lib/main.ts",
+    "run:protobuf": "yarn run --preset=protobuf"
   },
   "dependencies": {
     "axios": "^1.7.7",
