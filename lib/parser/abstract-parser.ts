@@ -1,11 +1,51 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { VersionData, FilesDependencies } from '@src/utils/types';
+import { VersionData } from '@src/versions-data-extractor/types';
+import { DependenciesMap, FilesDependencies, NamespaceMap } from './types';
 
 export default abstract class AbstractParser {
+  /**
+   * An array of file extensions that should be processed by this parser.
+   *
+   * This property should be overridden by subclasses to specify the file types the parser is designed to handle.
+   * For example, a subclass handling `.proto` files might set this to `['.proto']`.
+   * Other parsers might handle `.json`, `.xml`, or any other file types by setting appropriate extensions.
+   */
   protected abstract extensions: string[];
+  /**
+   * Extracts dependencies from a given file.
+   *
+   * This abstract method must be implemented by subclasses to extract dependencies from a file. Dependencies
+   * could be imported files, referenced resources, or any other files that the current file relies on.
+   *
+   * For example, in a `.proto` file, this might return the list of imported `.proto` files. In an XML-based
+   * file, it might return referenced schemas or other resources.
+   *
+   * @param {string} filePath - The path to the file from which to extract dependencies.
+   * @returns {string[]} - An array of dependencies (file paths) that the file relies on.
+   */
   protected abstract extractDependencies(filePath: string): string[];
+  /**
+   * Extracts a unique namespace or identifier from a given file.
+   *
+   * This abstract method must be implemented by subclasses to extract a namespace or other relevant identifier
+   * from the file. The namespace could be a package name, a root element tag, or some other identifier that
+   * gives context to the file's contents.
+   *
+   * For instance, in a `.proto` file, this might return the fully qualified package name. In an XML file, it
+   * could return the root tag's namespace or ID.
+   *
+   * @param {string} filePath - The path to the file from which to extract the namespace or identifier.
+   * @returns {string} - The fully qualified namespace or identifier.
+   */
   protected abstract extractNamespace(filePath: string): string;
+  /**
+   * Recursively collects files from a given directory that match the specified extensions.
+   *
+   * @param {string} dir - The directory to start searching for files.
+   * @param {string[]} files - An array to accumulate files (used for recursion).
+   * @returns {string[]} - A list of file paths matching the specified extensions.
+   */
   protected getFiles(dir: string, files: string[] = []): string[] {
     console.log(dir);
     const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -22,15 +62,14 @@ export default abstract class AbstractParser {
     return files;
   }
   /**
-   * Processes protobuf files to map dependencies and namespaces.
+   * Processes files to map dependencies and namespaces/identifiers.
    *
-   * This function recursively collects all `.proto` files from the given directory,
-   * reads each file to extract its import dependencies and the package and message
-   * names, and then creates two mappings:
+   * This function recursively collects all files with matching extensions from the given directory,
+   * reads each file to extract its dependencies and the namespace or identifier (such as a package,
+   * root element, or other relevant identifier), and then creates two mappings:
    *
-   * 1. **dependenciesMap**: A map that associates each `.proto` file with its resolved
-   *    dependencies (other `.proto` files it imports). The dependencies are resolved based
-   *    on version mappings provided in the `versionData`. If a dependency cannot be
+   * 1. **dependenciesMap**: A map that associates each file with its resolved dependencies (other files it references).
+   *    The dependencies are resolved based on version mappings provided in the `versionData`. If a dependency cannot be
    *    resolved or the file does not exist in the expected version, an error is thrown.
    *
    *    Example:
@@ -40,9 +79,8 @@ export default abstract class AbstractParser {
    *    "some-path/C/dependency.proto"  => []
    *    ```
    *
-   * 2. **namespaceMap**: A map that associates each `.proto` file with its fully
-   *    qualified package and the first message name. This can be useful for determining
-   *    the structure of the `.proto` files.
+   * 2. **namespaceMap**: A map that associates each file with its fully qualified namespace or identifier. This is useful for
+   *    determining the structure of files, such as packages, XML root tags, or other identifiers unique to the file type.
    *
    *    Example:
    *    ```
@@ -51,19 +89,18 @@ export default abstract class AbstractParser {
    *    'some-path/C/dependency.proto'  => 'someNamespace.models.Dependency'
    *    ```
    *
-   * @export
    * @param {VersionData} versionData - Contains information about file versions and their mappings.
-   * @param {string} baseDirectory - The base directory where `.proto` files are located.
+   * @param {string} baseDirectory - The base directory where files are located.
    * @returns {FilesDependencies} - An object containing two maps:
-   *  - `dependenciesMap`: Maps each `.proto` file to its list of resolved dependencies.
-   *  - `namespaceMap`: Maps each `.proto` file to its fully qualified package and message name.
+   *  - `dependenciesMap`: Maps each file to its list of resolved dependencies.
+   *  - `namespaceMap`: Maps each file to its fully qualified namespace or identifier.
    * @throws {Error} - If dependencies cannot be resolved or files are missing.
    */
   public parse(versionData: VersionData, baseDirectory: string): FilesDependencies {
     const files = this.getFiles(baseDirectory);
     const fileSet = new Set(files.map((file) => path.relative(baseDirectory, file)));
-    const dependenciesMap = new Map<string, string[]>();
-    const namespaceMap = new Map<string, string>();
+    const dependenciesMap: DependenciesMap = new Map<string, string[]>();
+    const namespaceMap: NamespaceMap = new Map<string, string>();
 
     files.forEach((file) => {
       const relativePath = path.relative(baseDirectory, file);

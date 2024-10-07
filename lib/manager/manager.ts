@@ -2,14 +2,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import AbstractParser from '@src/parser/abstract-parser';
 import AbstractRegistry from '@src/registry/abstract-registry';
-import { NamespaceMap, Reference } from '@src/utils/types';
 import VersionsDataExtractor from '@src/versions-data-extractor/version-data-extractor';
 import topologicalSort from '@src/utils/topological-sort';
 
 export default class Manager {
   protected readonly versionDataExtractor: VersionsDataExtractor;
 
-  constructor(protected readonly schemaRegistry: AbstractRegistry, protected readonly parser: AbstractParser) {
+  constructor(protected readonly schemaRegistry: AbstractRegistry<unknown>, protected readonly parser: AbstractParser) {
     this.versionDataExtractor = new VersionsDataExtractor();
   }
   /**
@@ -41,7 +40,7 @@ export default class Manager {
       const protoPath = path.join(baseDirectory, filepath);
       const protoContent = fs.readFileSync(protoPath, 'utf-8');
 
-      const references = this.buildReferences(
+      const references = this.schemaRegistry.buildReferences(
         filepath,
         dependenciesResult.dependenciesMap,
         dependenciesResult.namespaceMap,
@@ -55,26 +54,5 @@ export default class Manager {
       await this.schemaRegistry.registerSchema(formattedSubject, protoContent, references);
       console.log(`Registered proto schema for ${formattedSubject}`);
     }
-  }
-
-  private buildReferences(
-    filepath: string,
-    dependenciesMap: Map<string, string[]>,
-    namespaceMap: NamespaceMap,
-    subjects: Map<string, string>,
-  ): Reference[] {
-    const dependencies = dependenciesMap.get(filepath);
-    if (!dependencies) throw new Error(`Subject ${filepath} is not registered`);
-    const references = [];
-    for (const dependency of dependencies) {
-      const name = namespaceMap.get(dependency);
-      if (!name) throw new Error(`Subject ${dependency} is not registered`);
-      references.push({
-        name,
-        subject: subjects.get(dependency)!,
-        version: -1,
-      });
-    }
-    return references;
   }
 }

@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as util from 'util';
-import { VersionData } from '../utils/types';
+
+import { FileMap, VersionData, VersionMap } from './types';
 
 const readdir = util.promisify(fs.readdir);
 const readFile = util.promisify(fs.readFile);
@@ -12,11 +13,13 @@ export default class VersionsDataExtractor {
    * Extracts version data from the provided base directory.
    *
    * This function recursively scans the given base directory to find all `versions.json`
-   * files, which contain version mappings for `.proto` files. It reads and processes each
+   * files, which contain version mappings for schema files. It reads and processes each
    * `versions.json` file to create two mappings:
    *
-   * 1. **fileMap**: A map that associates each `.proto` file with an array of version objects.
-   *    Each version object includes the version identifier and the full version path.
+   * 1. **versionMap**: A map that associates each version directory with a mapping of schema files
+   *    to their resolved file paths. This helps in determining which file corresponds to a version
+   *    and where it is located.
+   *
    *
    *    Example:
    *    ```
@@ -32,9 +35,8 @@ export default class VersionsDataExtractor {
    *    }
    *    ```
    *
-   * 2. **versionMap**: A map that associates each version directory with a mapping of `.proto` files
-   *    to their resolved file paths. This helps in determining which file corresponds to a version
-   *    and where it is located.
+   * 2. **fileMap**: A map that associates each schema file with an array of version objects.
+   *    Each version object includes the version identifier and the full version path.
    *
    *    Example:
    *    ```
@@ -56,20 +58,26 @@ export default class VersionsDataExtractor {
    *  - `versionMap`: Maps version directories to `.proto` file mappings.
    * @throws {Error} - If there is an issue reading or processing files.
    */
-  public async extract(baseDirectory: string) {
+  public async extract(baseDirectory: string): Promise<VersionData> {
     this.baseDirectory = baseDirectory;
-    const fileMap: Map<string, Array<{ version: string; full: string }>> = new Map();
-    const versionMap: Map<string, Map<string, string>> = new Map();
+    const fileMap: FileMap = new Map();
+    const versionMap: VersionMap = new Map();
 
     await this.processDirectory(baseDirectory, versionMap, fileMap);
 
     return { fileMap, versionMap };
   }
-  private async processDirectory(
-    currentPath: string,
-    versionMap: Map<string, Map<string, string>>,
-    fileMap: Map<string, Array<{ version: string; full: string }>>,
-  ) {
+
+  /**
+   * Recursively scans the directory for `versions.json` files.
+   *
+   * @private
+   * @param {string} currentPath - The current directory being processed.
+   * @param {VersionMap} versionMap - A map that tracks version directories and their corresponding `.proto` files.
+   * @param {FileMap} fileMap - A map that tracks `.proto` files and the versions they are associated with.
+   * @returns {Promise<void>}
+   */
+  private async processDirectory(currentPath: string, versionMap: VersionMap, fileMap: FileMap): Promise<void> {
     const entries = await readdir(currentPath, { withFileTypes: true });
     for (const entry of entries) {
       const absolutePath = path.join(currentPath, entry.name);
@@ -81,11 +89,16 @@ export default class VersionsDataExtractor {
     }
   }
 
-  private async processFile(
-    filePath: string,
-    versionMap: Map<string, Map<string, string>>,
-    fileMap: Map<string, Array<{ version: string; full: string }>>,
-  ) {
+  /**
+   * Reads and processes a `versions.json` file, updating the `versionMap` and `fileMap` accordingly.
+   *
+   * @private
+   * @param {string} filePath - Full path to the `versions.json` file.
+   * @param {VersionMap} versionMap - A map that tracks version directories and their corresponding `.proto` files.
+   * @param {FileMap} fileMap - A map that tracks `.proto` files and the versions they are associated with.
+   * @returns {Promise<void>}
+   */
+  private async processFile(filePath: string, versionMap: VersionMap, fileMap: FileMap): Promise<void> {
     const data: VersionData = JSON.parse(await readFile(filePath, 'utf8'));
     const directoryPath = path.dirname(filePath);
     const relativeDirectoryPath = path.relative(this.baseDirectory, directoryPath);

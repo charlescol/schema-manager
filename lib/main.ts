@@ -15,7 +15,7 @@ import ProtobufParser from './parser/protobuf-parser';
   const args = minimist(process.argv.slice(2));
   const preset: string = args.preset || 'protobuf'; // Default to "protobuf" preset
 
-  const registry: AbstractRegistry = new ConfluentRegistry({
+  const registry = new ConfluentRegistry({
     schemaRegistryUrl: SCHEMA_REGISTRY_URL,
   });
 

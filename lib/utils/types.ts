@@ -7,22 +7,6 @@ export interface VersionMap {
 
 export type VersionDependenciesMap = Map<string, string>;
 
-export type Reference = {
-  name: string;
-  subject: string;
-  version: number;
-};
-
-export type VersionData = {
-  fileMap: Map<string, Array<{ version: string; full: string }>>;
-  versionMap: Map<string, Map<string, string>>;
-};
-
 export type SchemaRegistryConfig = {
   schemaRegistryUrl: string;
-};
-
-export type FilesDependencies = {
-  namespaceMap: Map<string, string>;
-  dependenciesMap: Map<string, string[]>;
 };
