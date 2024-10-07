@@ -4,9 +4,11 @@ import ConfluentRegistry from './registry/confluent-registry';
 import AbstractRegistry from './registry/abstract-registry';
 import Manager from './manager/manager';
 import ProtobufParser from './parser/protobuf-parser';
+import AbstractParser from './parser/abstract-parser';
+import manager from './manager/manager';
 
 (async () => {
-  let manager: Manager;
+  let parser: AbstractParser;
   let baseDirectory: string;
 
   const SCHEMA_REGISTRY_URL = 'http://localhost:8081';
@@ -21,11 +23,11 @@ import ProtobufParser from './parser/protobuf-parser';
 
   switch (preset) {
     default:
-      manager = new Manager(registry, new ProtobufParser());
+      parser = new ProtobufParser();
       baseDirectory = `${SCHEMA_DIR}/protobuf`;
       break;
   }
-
+  const manager = new Manager(registry, parser);
   await manager!.loadAll(baseDirectory!, (versions: string[], filepath: string): string => {
     // Extract the numbers from version names, keeping the original version for custom names
     const processedVersion = versions.map((version) => {
