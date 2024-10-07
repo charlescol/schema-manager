@@ -7,7 +7,7 @@ import { FileMap, VersionData, VersionMap } from './types';
 const readdir = util.promisify(fs.readdir);
 const readFile = util.promisify(fs.readFile);
 
-export default class VersionsDataExtractor {
+export default class VersionsExtractor {
   private baseDirectory: string;
   /**
    * Extracts version data from the provided base directory.

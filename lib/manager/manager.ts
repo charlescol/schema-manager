@@ -2,14 +2,15 @@ import * as path from 'path';
 import * as fs from 'fs';
 import AbstractParser from '@src/parser/abstract-parser';
 import AbstractRegistry from '@src/registry/abstract-registry';
-import VersionsDataExtractor from '@src/versions-data-extractor/version-data-extractor';
+
 import topologicalSort from '@src/utils/topological-sort';
+import VersionsExtractor from '@src/versions-extractor/version-extractor';
 
 export default class Manager {
-  protected readonly versionDataExtractor: VersionsDataExtractor;
+  protected readonly versionDataExtractor: VersionsExtractor;
 
   constructor(protected readonly schemaRegistry: AbstractRegistry<unknown>, protected readonly parser: AbstractParser) {
-    this.versionDataExtractor = new VersionsDataExtractor();
+    this.versionDataExtractor = new VersionsExtractor();
   }
   /**
    * Loads all Protobuf schemas from the specified directory, processes them, and registers them

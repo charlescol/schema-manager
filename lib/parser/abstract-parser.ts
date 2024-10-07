@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { VersionData } from '@src/versions-data-extractor/types';
 import { DependenciesMap, FilesDependencies, NamespaceMap } from './types';
+import { VersionData } from '@src/versions-extractor/types';
 
 export default abstract class AbstractParser {
   /**
