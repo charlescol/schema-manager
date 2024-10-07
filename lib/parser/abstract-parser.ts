@@ -7,7 +7,7 @@ export default abstract class AbstractParser {
   /**
    * An array of file extensions that should be processed by this parser.
    *
-   * This property should be overridden by subclasses to specify the file types the parser is designed to handle.
+   * Specify the file types the parser is designed to handle.
    * For example, a subclass handling `.proto` files might set this to `['.proto']`.
    * Other parsers might handle `.json`, `.xml`, or any other file types by setting appropriate extensions.
    */
@@ -15,11 +15,8 @@ export default abstract class AbstractParser {
   /**
    * Extracts dependencies from a given file.
    *
-   * This abstract method must be implemented by subclasses to extract dependencies from a file. Dependencies
+   * Extract dependencies from a file. Dependencies
    * could be imported files, referenced resources, or any other files that the current file relies on.
-   *
-   * For example, in a `.proto` file, this might return the list of imported `.proto` files. In an XML-based
-   * file, it might return referenced schemas or other resources.
    *
    * @param {string} filePath - The path to the file from which to extract dependencies.
    * @returns {string[]} - An array of dependencies (file paths) that the file relies on.
@@ -28,12 +25,9 @@ export default abstract class AbstractParser {
   /**
    * Extracts a unique namespace or identifier from a given file.
    *
-   * This abstract method must be implemented by subclasses to extract a namespace or other relevant identifier
+   * Extract a namespace or other relevant identifier
    * from the file. The namespace could be a package name, a root element tag, or some other identifier that
    * gives context to the file's contents.
-   *
-   * For instance, in a `.proto` file, this might return the fully qualified package name. In an XML file, it
-   * could return the root tag's namespace or ID.
    *
    * @param {string} filePath - The path to the file from which to extract the namespace or identifier.
    * @returns {string} - The fully qualified namespace or identifier.
