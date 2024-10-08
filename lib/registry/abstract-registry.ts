@@ -1,4 +1,5 @@
 import { DependenciesMap, NamespaceMap } from '../parser/types';
+import SchemaType from '../types';
 import { RegistryConfig } from './types';
 
 export default abstract class AbstractRegistry<TRef> {
@@ -16,9 +17,15 @@ export default abstract class AbstractRegistry<TRef> {
    * @param schema The content of the schema as a string
    * @param references An array of references to other schemas that this schema depends on, typically containing
    *                   the name, subject, and version of each referenced schema
+   * @param schemaType The format of the schema being registered (e.g., 'PROTOBUF', 'AVRO').
    * @returns {*} Result of the schema registration (typically a response from the schema registry service)
    */
-  public abstract registerSchema(subject: string, schema: string, references: TRef[]): Promise<object>;
+  public abstract registerSchema(
+    subject: string,
+    schema: string,
+    references: TRef[],
+    schemaType: SchemaType,
+  ): Promise<object>;
 
   /**
    * Constructs an array of references for a schema based on its dependencies.

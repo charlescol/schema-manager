@@ -1,0 +1,11 @@
+{
+  "namespace": "topic1",
+  "type": "record",
+  "name": "Data",
+  "fields": [
+    {
+      "name": "additional_info",
+      "type": "string"
+    }
+  ]
+}

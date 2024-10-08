@@ -101,7 +101,6 @@ export default abstract class AbstractParser {
       const dependencies = this.extractDependencies(file);
       namespaceMap.set(relativePath, this.extractNamespace(file));
       const fileVersions = versionData.fileMap.get(relativePath) ?? [];
-
       const fullDependencies = new Set<string>();
       dependencies.forEach((dep) => {
         fileVersions.forEach((versionInfo) => {

@@ -9,7 +9,8 @@ export default class ProtobufParser extends AbstractParser {
     const dependencies = lines
       .filter((line) => line.startsWith('import'))
       .map((line) => line.match(/"([^"]+)"/)?.[1])
-      .filter((name): name is string => Boolean(name));
+      .filter((name): name is string => Boolean(name))
+      .map((name) => name.replace(/\.\w+$/, ''));
     return dependencies;
   }
 

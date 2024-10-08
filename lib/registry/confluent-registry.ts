@@ -1,16 +1,21 @@
 import axios from 'axios';
-import { SchemaType } from '../types';
+import SchemaType from '../types';
 import AbstractRegistry from './abstract-registry';
 import { ConfluentRegistryReference } from './types';
 import { DependenciesMap, NamespaceMap } from '../parser/types';
 
 export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistryReference> {
-  async registerSchema(subject: string, schema: string, references: ConfluentRegistryReference[]): Promise<object> {
+  async registerSchema(
+    subject: string,
+    schema: string,
+    references: ConfluentRegistryReference[],
+    schemaType: SchemaType,
+  ): Promise<object> {
     try {
       const response = await axios.post(
         `${this.config.schemaRegistryUrl}/subjects/${subject}/versions`,
         {
-          schemaType: SchemaType.PROTOBUF,
+          schemaType,
           schema,
           references,
         },

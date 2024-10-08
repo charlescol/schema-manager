@@ -3,12 +3,12 @@ import * as minimist from 'minimist';
 import ConfluentRegistry from '../dist/registry/confluent-registry';
 import Manager from '../dist/manager/manager';
 import ProtobufParser from '../dist/parser/protobuf-parser';
+import AvroParser from '../dist/parser/avro-parser';
 import AbstractParser from '../dist/parser/abstract-parser';
+import SchemaType from '../dist/types';
+import { versions } from 'process';
 
 (async () => {
-  let parser: AbstractParser;
-  let baseDirectory: string;
-
   const SCHEMA_REGISTRY_URL = 'http://localhost:8081';
   const SCHEMA_DIR = path.resolve(__dirname, '../examples');
 
@@ -19,26 +19,32 @@ import AbstractParser from '../dist/parser/abstract-parser';
     schemaRegistryUrl: SCHEMA_REGISTRY_URL,
   });
 
-  switch (preset) {
+  switch (preset.toUpperCase()) {
+    case SchemaType.AVRO:
+      await new Manager(registry, new AvroParser()).loadAll(`${SCHEMA_DIR}/avro`, subjectBuilder, SchemaType.AVRO);
+      break;
     default:
-      parser = new ProtobufParser();
-      baseDirectory = `${SCHEMA_DIR}/protobuf`;
+      await new Manager(registry, new ProtobufParser()).loadAll(
+        `${SCHEMA_DIR}/protobuf`,
+        subjectBuilder,
+        SchemaType.PROTOBUF,
+      );
       break;
   }
-  const manager = new Manager(registry, parser);
-  await manager!.loadAll(baseDirectory!, (versions: string[], filepath: string): string => {
-    // Extract the numbers from version names, keeping the original version for custom names
-    const processedVersion = versions.map((version) => {
-      const numericPart = version.replace(/\D/g, '');
-      return numericPart || version;
-    });
-
-    const minVersion = processedVersion.sort()[0]; // Select the minimum version
-    return (
-      filepath
-        .replace(/\/v\d+/, '') // Remove the version directory (e.g., /v1)
-        .replace(/\.proto$/, '') // Remove the .proto file extension
-        .replace(/[/\\]/g, '.') + `.v${minVersion}` // Convert path separators to dots and append the minimum version
-    );
-  });
 })();
+
+function subjectBuilder(versions: string[], filepath: string): string {
+  // Extract the numbers from version names, keeping the original version for custom names
+  const processedVersion = versions.map((version) => {
+    const numericPart = version.replace(/\D/g, '');
+    return numericPart || version;
+  });
+
+  const minVersion = processedVersion.sort()[0]; // Select the minimum version
+  return (
+    filepath
+      .replace(/\/v\d+/, '') // Remove the version directory (e.g., /v1)
+      .replace(/\.[^/.]+$/, '') // Remove any file extension (the part after the last dot)
+      .replace(/[/\\]/g, '.') + `.v${minVersion}` // Convert path separators to dots and append the minimum version
+  );
+}

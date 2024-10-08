@@ -1,0 +1,22 @@
+{
+  "namespace": "topic1",
+  "type": "record",
+  "name": "Model",
+  "fields": [
+    {
+      "name": "data",
+      "type": "Data"
+    },
+    {
+      "name": "description",
+      "type": "string"
+    },
+    {
+      "name": "tags",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    }
+  ]
+}

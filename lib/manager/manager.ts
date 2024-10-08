@@ -4,6 +4,7 @@ import AbstractParser from '../parser/abstract-parser';
 import AbstractRegistry from '../registry/abstract-registry';
 import topologicalSort from '../utils/topological-sort';
 import VersionsExtractor from '../versions-extractor/version-extractor';
+import SchemaType from '../types';
 
 export default class Manager {
   protected readonly versionDataExtractor: VersionsExtractor;
@@ -29,6 +30,7 @@ export default class Manager {
   public async loadAll(
     baseDirectory: string,
     subjectBuilder: (versions: string[], filepath: string) => string,
+    schemaType: SchemaType,
   ): Promise<void> {
     const versionsResolution = await this.versionDataExtractor.extract(baseDirectory);
     const dependenciesResult = this.parser.parse(versionsResolution, baseDirectory);
@@ -51,7 +53,7 @@ export default class Manager {
         filepath,
       );
       subjects.set(filepath, formattedSubject);
-      await this.schemaRegistry.registerSchema(formattedSubject, protoContent, references);
+      await this.schemaRegistry.registerSchema(formattedSubject, protoContent, references, schemaType);
       console.log(`Registered proto schema for ${formattedSubject}`);
     }
   }
