@@ -4,7 +4,7 @@
 
 ### Introduction
 
-In modern microservices architectures, separating concerns is critical for scalability and maintainability. Managing schema files (e.g., Protobuf) across services can become complex and error-prone, especially when each microservice is responsible for publishing schemas to a schema registry (e.g., Confluent Schema Registry).
+In modern microservices architectures, separating concerns is critical for scalability and maintainability. Managing schema files (e.g., Avro, Protobuf, JSON) across services can become complex and error-prone, especially when each microservice is responsible for publishing schemas to a schema registry (e.g., Confluent Schema Registry).
 
 Schema Manager solves this by centralizing schema management and delegation. Instead of allowing microservices to handle schema publication directly, Schema Manager automates the versioning, dependency resolution, and registration of schemas in a centralized repository. This approach keeps microservices lightweight, while Schema Manager handles all the complexity of schema registration and lifecycle management.
 
