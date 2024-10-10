@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import AbstractParser from './abstract-parser';
 export default class ProtobufParser extends AbstractParser {
   protected extensions = ['.proto'];
@@ -10,7 +11,10 @@ export default class ProtobufParser extends AbstractParser {
       .filter((line) => line.startsWith('import'))
       .map((line) => line.match(/"([^"]+)"/)?.[1])
       .filter((name): name is string => Boolean(name))
-      .map((name) => name.replace(/\.\w+$/, ''));
+      .map((name) => {
+        const fileNameWithExtension = path.basename(name); // Extract the filename including extension
+        return fileNameWithExtension.replace(/\.\w+$/, ''); // Remove the extension
+      });
     return dependencies;
   }
 

@@ -99,6 +99,7 @@ export default abstract class AbstractParser {
     files.forEach((file) => {
       const relativePath = path.relative(baseDirectory, file);
       const dependencies = this.extractDependencies(file);
+      console.log(dependencies);
       namespaceMap.set(relativePath, this.extractNamespace(file));
       const fileVersions = versionData.fileMap.get(relativePath) ?? [];
       const fullDependencies = new Set<string>();

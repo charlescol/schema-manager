@@ -1,7 +1,9 @@
 syntax = "proto3";
 
 package topic1;
+import "common/v1/entity.proto";
 
 message Data {
   string additional_info = 1;
+  common.Entity entity = 1;
 }

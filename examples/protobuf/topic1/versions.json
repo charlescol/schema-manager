@@ -5,6 +5,7 @@
   },
   "v2": {
     "data": "v2/data.proto",
-    "model": "v1/model.proto"
+    "model": "v1/model.proto",
+    "entity": "../common/v1/entity.proto"
   }
 }
