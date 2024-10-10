@@ -4,6 +4,7 @@
   },
   "test2": {
     "data": "v1/data.avsc",
-    "model": "v2/model.avsc"
+    "model": "v2/model.avsc",
+    "entity": "../common/v1/entity.avsc"
   }
 }

@@ -1,0 +1,11 @@
+{
+  "namespace": "common",
+  "type": "record",
+  "name": "Entity",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    }
+  ]
+}

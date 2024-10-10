@@ -17,6 +17,13 @@
         "type": "array",
         "items": "string"
       }
+    },
+    {
+      "name": "entities",
+      "type": {
+        "type": "array",
+        "items": "common.Entity"
+      }
     }
   ]
 }
