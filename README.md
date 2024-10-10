@@ -40,7 +40,7 @@ Consider a system managing a set of schemas for an event-driven architecture. Ea
 
 **Note:** Multiple examples, including those mentioned here with different schema types (Protobuf, Avro, etc.), are located within the repository at `./examples`. These examples showcase various use cases and help demonstrate how Schema Manager resolves dependencies and registers schemas for different schema formats. You can explore these to better understand how to set up your own schema management workflow.
 
-In this first example, we have two topics: topic1 and topic2, and a common namespace. Each can contain multiple versions of schema files. The version mapping is maintained using versions.json files, and custom version names (e.g., v1.0) are supported by Schema Manager. This example demonstrates how Schema Manager resolves versioning and dependencies across topics and versions.
+In this first example, we have two topics: topic1 and topic2, and a common namespace. Each can contain multiple versions of schema files. The version mapping is maintained using versions.json files, and custom version names, such as strings (e.g., v1.0, alpha, beta), are fully supported by Schema Manager in addition to version numbers. This example demonstrates how Schema Manager resolves versioning and dependencies across topics and versions.
 
 **Note:** A single versions.json could have been used to manage all the topics in a centralized way. Additionally, Schema Manager supports multiple versions.json files within the same directory.
 
