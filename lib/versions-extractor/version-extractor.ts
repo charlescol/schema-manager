@@ -107,7 +107,7 @@ export default class VersionsExtractor {
           fileMap.set(relativeFullPath, []);
         }
         fileMap.get(relativeFullPath)!.push({ version, full: fullVersionPath });
-        versionMap.get(fullVersionPath)!.set(file, relativeFullPath);
+        versionMap.get(fullVersionPath)!.set(file.toLowerCase(), relativeFullPath);
       }
     }
   }
