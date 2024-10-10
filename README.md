@@ -85,7 +85,7 @@ example-schemas/
 
 ```json
 {
-  "v1": {
+  "v1.0": {
     "data2": "v1/data2.proto"
   }
 }
