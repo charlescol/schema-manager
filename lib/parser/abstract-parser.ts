@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { DependenciesMap, FilesDependencies, NamespaceMap } from './types';
 import { VersionData } from '../versions-extractor/types';
+import SchemaType from '../types';
 
 export default abstract class AbstractParser {
   /**
@@ -11,7 +12,12 @@ export default abstract class AbstractParser {
    * For example, a subclass handling `.proto` files might set this to `['.proto']`.
    * Other parsers might handle `.json`, `.xml`, or any other file types by setting appropriate extensions.
    */
-  protected abstract extensions: string[];
+  protected abstract readonly extensions: string[];
+  /**
+   * An array of schema types that are supported by the parser.
+   * This is used in the `getSchemaType` method to determine the appropriate schema for a given file.
+   */
+  protected abstract readonly schemaTypes: SchemaType[];
   /**
    * Extracts dependencies from a given file.
    *
@@ -41,7 +47,6 @@ export default abstract class AbstractParser {
    * @returns {string[]} - A list of file paths matching the specified extensions.
    */
   protected getFiles(dir: string, files: string[] = []): string[] {
-    console.log(dir);
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     entries.forEach((entry) => {
       const fullPath = path.join(dir, entry.name);
@@ -54,6 +59,23 @@ export default abstract class AbstractParser {
       }
     });
     return files;
+  }
+  /**
+   * Default implementation to return the schema type for a given file path.
+   *
+   * This method provides a default behavior by returning the first schema type in the list of supported schema types.
+   * It can be overridden by subclasses if a more specific schema type needs to be determined based on the file path or contents.
+   * If no schema types are defined, it throws an error, ensuring at least one schema type must be configured.
+   *
+   * @param {string} filepath - The path to the file being processed.
+   * @returns {SchemaType} - The schema type associated with the given file.
+   * @throws {Error} - If no schema type is specified for the parser.
+   */
+  public getSchemaType(filepath: string): SchemaType {
+    if (!this.schemaTypes.length) {
+      throw new Error(`No schema type specified, need to specify at least one schema type`);
+    }
+    return this.schemaTypes[0];
   }
   /**
    * Processes files to map dependencies and namespaces/identifiers.

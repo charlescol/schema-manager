@@ -21,14 +21,10 @@ import { versions } from 'process';
 
   switch (preset.toUpperCase()) {
     case SchemaType.AVRO:
-      await new Manager(registry, new AvroParser()).loadAll(`${SCHEMA_DIR}/avro`, subjectBuilder, SchemaType.AVRO);
+      await new Manager(registry, new AvroParser()).loadAll(`${SCHEMA_DIR}/avro`, subjectBuilder);
       break;
     default:
-      await new Manager(registry, new ProtobufParser()).loadAll(
-        `${SCHEMA_DIR}/protobuf`,
-        subjectBuilder,
-        SchemaType.PROTOBUF,
-      );
+      await new Manager(registry, new ProtobufParser()).loadAll(`${SCHEMA_DIR}/protobuf`, subjectBuilder);
       break;
   }
 })();

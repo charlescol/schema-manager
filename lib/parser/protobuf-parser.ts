@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import AbstractParser from './abstract-parser';
+import SchemaType from '../types';
 export default class ProtobufParser extends AbstractParser {
   protected extensions = ['.proto'];
-
+  protected schemaTypes = [SchemaType.PROTOBUF];
   protected extractDependencies(filePath: string): string[] {
     const content = fs.readFileSync(filePath, 'utf8');
     const lines = content.split(/\r?\n/);
