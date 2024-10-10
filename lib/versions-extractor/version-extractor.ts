@@ -20,12 +20,12 @@ export default class VersionsExtractor {
    *    ```
    *    Map(3) {
    *      'some-path/test/a' => Map(2) {
-   *        'file.proto' => 'some-path/test/A/file.proto',
-   *        'dependency.proto' => 'some-path/test/B/dependency.proto'
+   *        'file' => 'some-path/test/A/file.proto',
+   *        'dependency' => 'some-path/test/B/dependency.proto'
    *      },
    *      'some-path/test/b' => Map(2) {
-   *        'file.proto' => 'some-path/test/A/file.proto',
-   *        'dependency.proto' => 'some-path/test/C/dependency.proto'
+   *        'file' => 'some-path/test/A/file.proto',
+   *        'dependency' => 'some-path/test/C/dependency.proto'
    *      }
    *    }
    *    ```
