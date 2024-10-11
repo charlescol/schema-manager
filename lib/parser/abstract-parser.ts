@@ -150,4 +150,3 @@ export default abstract class AbstractParser {
     return { dependenciesMap, namespaceMap };
   }
 }
-ù;
