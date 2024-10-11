@@ -18,7 +18,7 @@ You can install Schema Manager using NPM:
 npm install @charlescol/schema-manager
 ```
 
-After installation, organize your .proto schema files in versioned directories and create a versions.json file to map versions. Then run Schema Manager to automatically register your schemas with the schema registry.
+After installation, organize your schema files in versioned directories and create a versions.json file to map versions. Then run Schema Manager to automatically register your schemas with the schema registry.
 
 ### Key Features
 
@@ -40,7 +40,7 @@ Consider a system managing a set of schemas for an event-driven architecture. Ea
 
 **Note:** Multiple examples, including those mentioned here with different schema types (Protobuf, Avro, etc.), are located within the repository at `./examples`. These examples showcase various use cases and help demonstrate how Schema Manager resolves dependencies and registers schemas for different schema formats. You can explore these to better understand how to set up your own schema management workflow.
 
-In this first example, we have two topics: topic1 and topic2, and a common namespace. Each can contain multiple versions of schema files. The version mapping is maintained using versions.json files, and custom version names, such as strings (e.g., v1.0, alpha, beta), are fully supported by Schema Manager in addition to version numbers. This example demonstrates how Schema Manager resolves versioning and dependencies across topics and versions.
+In this example, we have two topics, topic1 and topic2, as well as a common namespace. Each topic contains multiple versions of schema files, with version mapping handled through versions.json files. Schema Manager supports both standard version numbers (e.g., v1, v2) and custom version strings (e.g., v1.0, alpha, beta). This allows flexibility in version naming, while Schema Manager handles versioning and dependency resolution across topics and versions
 
 **Note:** A single versions.json could have been used to manage all the topics in a centralized way. Additionally, Schema Manager supports multiple versions.json files within the same directory.
 

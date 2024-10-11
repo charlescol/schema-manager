@@ -19,13 +19,14 @@ export default abstract class AbstractParser {
    */
   protected abstract readonly schemaTypes: SchemaType[];
   /**
-   * Extracts dependencies from a given file.
+   * Extracts dependencies names from a given file.
    *
-   * Extract dependencies from a file. Dependencies
-   * could be imported files, referenced resources, or any other files that the current file relies on.
+   * Dependencies could be imported files, referenced resources, or any other files that the current file relies on.
+   * A dependency name should not include the extension and must only consist of the file name
+   * (without the file path). The result is case-insensitive.
    *
    * @param {string} filePath - The path to the file from which to extract dependencies.
-   * @returns {string[]} - An array of dependencies (file paths) that the file relies on.
+   * @returns {string[]} - An array of dependency names (without extensions or paths), that the file relies on.
    */
   protected abstract extractDependencies(filePath: string): string[];
   /**
@@ -149,3 +150,4 @@ export default abstract class AbstractParser {
     return { dependenciesMap, namespaceMap };
   }
 }
+ù;
