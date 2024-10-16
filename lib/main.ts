@@ -4,9 +4,7 @@ import ConfluentRegistry from '../dist/registry/confluent-registry';
 import Manager from '../dist/manager/manager';
 import ProtobufParser from '../dist/parser/protobuf-parser';
 import AvroParser from '../dist/parser/avro-parser';
-import AbstractParser from '../dist/parser/abstract-parser';
 import SchemaType from '../dist/types';
-import { versions } from 'process';
 
 (async () => {
   const SCHEMA_REGISTRY_URL = 'http://localhost:8081';
@@ -17,6 +15,16 @@ import { versions } from 'process';
 
   const registry = new ConfluentRegistry({
     schemaRegistryUrl: SCHEMA_REGISTRY_URL,
+    // Below part is optional, used to override queries to the schema registry
+    body: {
+      compatibilityGroup: 'application.major.version',
+    },
+    queryParams: {
+      normalize: true,
+    },
+    headers: {
+      Accept: 'application/vnd.schemaregistry.v1+json',
+    },
   });
 
   switch (preset.toUpperCase()) {
@@ -35,7 +43,6 @@ function subjectBuilder(versions: string[], filepath: string): string {
     const numericPart = version.replace(/\D/g, '');
     return numericPart || version;
   });
-
   const minVersion = processedVersion.sort()[0]; // Select the minimum version
   return (
     filepath

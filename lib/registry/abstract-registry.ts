@@ -12,11 +12,9 @@ export default abstract class AbstractRegistry<TRef> {
    * The schema is identified by a unique `subject`, and any dependencies (references) are provided via `references`.
    * The exact behavior of this method depends on the implementation in a specific registry.
    *
-   * @abstract
    * @param subject The unique identifier for the schema in the registry
    * @param schema The content of the schema as a string
-   * @param references An array of references to other schemas that this schema depends on, typically containing
-   *                   the name, subject, and version of each referenced schema
+   * @param references An array of references to other schemas that this schema depends on, typically containing the name, subject, and version of each referenced schema
    * @param schemaType The format of the schema being registered (e.g., 'PROTOBUF', 'AVRO').
    * @returns {*} Result of the schema registration (typically a response from the schema registry service)
    */
@@ -34,7 +32,6 @@ export default abstract class AbstractRegistry<TRef> {
    * are typically constructed by looking up the schema's dependencies in `dependenciesMap`, retrieving their
    * namespaces from `namespaceMap`, and associating them with their corresponding subjects in the `subjects` map.
    *
-   * @abstract
    * @param filepath The path of the schema file for which references are being built
    * @param dependenciesMap A map that lists the dependencies for each schema file
    * @param namespaceMap A map that associates each schema file with its namespace or identifier

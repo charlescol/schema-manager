@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as qs from 'qs';
 import SchemaType from '../types';
 import AbstractRegistry from './abstract-registry';
 import { ConfluentRegistryReference } from './types';
@@ -12,16 +13,21 @@ export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistr
     schemaType: SchemaType,
   ): Promise<object> {
     try {
+      const queryString = qs.stringify(this.config.queryParams, { addQueryPrefix: true });
+      const url = `${this.config.schemaRegistryUrl}/subjects/${subject}/versions${queryString}`;
+
       const response = await axios.post(
-        `${this.config.schemaRegistryUrl}/subjects/${subject}/versions`,
+        url,
         {
           schemaType,
           schema,
           references,
+          ...this.config.body,
         },
         {
           headers: {
             'Content-Type': 'application/json',
+            ...this.config.headers,
           },
         },
       );
