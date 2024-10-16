@@ -1,6 +1,6 @@
 # Schema Manager
 
-## Automating Schema Versioning and Dependency Management for Protobuf Files
+## Automating Schema Versioning and Dependency Management for Schema Files
 
 ### Introduction
 
