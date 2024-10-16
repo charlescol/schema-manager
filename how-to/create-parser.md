@@ -1,4 +1,4 @@
-# How to Create a Parser for Schema Files
+# How to Create a Parser
 
 This guide will walk you through the process of creating a parser for schema files by extending an abstract base class (AbstractParser). The goal of this parser is to read schema files, extract dependencies, and identify unique namespaces or identifiers within the files. This approach allows consistent and structured handling of various file types such as .proto, .json, .xml, etc.
 
@@ -36,7 +36,7 @@ protected schemaTypes = [SchemaType.PROTOBUF];
 
 ### Extract Dependencies
 
-This method should define how to extract dependencies from the file. For Protobuf files, dependencies are found using import statements:
+This method should define how to extract dependencies from the file. It's worth noting that the result is case insensitive, meaning that the dependencies returned are compared to the names in the versions.json without considering letter casing differences. For Protobuf files, dependencies are found using import statements:
 
 ```typescript
 protected extractDependencies(filePath: string): string[] {

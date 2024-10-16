@@ -19,6 +19,8 @@ export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistr
 
 When you define the class ConfluentRegistry as a subclass of AbstractRegistry using the generic type ConfluentRegistryReference, you are specifying that all references handled by this registry will conform to the structure defined by ConfluentRegistryReference. This ensures that the references processed by this class will contain all the required properties.
 
+Based on the [Confluent documentation](https://docs.confluent.io/platform/current/schema-registry/fundamentals/serdes-develop/index.html#referenced-schemas), the reference object should contain the following properties:
+
 ```typescript
 export type ConfluentRegistryReference = {
   name: string;
