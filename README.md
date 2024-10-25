@@ -50,13 +50,15 @@ Please refer to the [Registry Documentation](how-to/create-registry.md) for more
 
 ## Scenario Example
 
-Consider a system managing a set of schemas for an event-driven architecture. Each schema has multiple versions and dependencies.
+Consider a system managing a set of Protobuf schemas for an event-driven architecture. Each schema has multiple versions and dependencies.
 
 **Note:** Multiple examples, including those mentioned here with different schema types (Protobuf, Avro, etc.), are located within the repository at `./examples`. These examples showcase various use cases and help demonstrate how Schema Manager resolves dependencies and registers schemas for different schema formats. You can explore these to better understand how to set up your own schema management workflow.
 
 In this example, we have two topics, topic1 and topic2, as well as a common namespace. Each topic contains multiple versions of schema files, with version mapping handled through versions.json files. Schema Manager supports both standard version numbers (e.g., v1, v2) and custom version strings (e.g., v1.0, alpha, beta). This allows flexibility in version naming, while Schema Manager handles versioning and dependency resolution across topics and versions
 
 **Note:** A single versions.json could have been used to manage all the topics in a centralized way. Additionally, Schema Manager supports multiple versions.json files within the same directory.
+
+**Note2:** The schema name must be unique across a given version of a topic (this include all the dependencies referenced in the versions.json file for the version).
 
 **File Structure:**
 
@@ -69,10 +71,6 @@ example-schemas/
   │   ├── v2/
   │   │   └── data.proto         # Schema for v2 data (depends on ./common/v1/entity.proto)
   │   └── versions.json          # Version mapping for topic1 (v1 and v2)
-  ├── topic2/
-  │   ├── v1.0/
-  │   │   └── data2.proto        # Schema for v1.0 data of topic2
-  │   └── versions.json          # Version mapping for topic2 (v1.0)
   ├── common/
   │   ├── v1/
   │   │   └── entity.proto       # Schema for test entity
@@ -91,16 +89,6 @@ example-schemas/
     "data": "v2/data.proto",
     "model": "v1/model.proto",
     "entity": "../common/v1/entity.proto"
-  }
-}
-```
-
-**versions.json for topic2:**
-
-```json
-{
-  "v1.0": {
-    "data2": "v1/data2.proto"
   }
 }
 ```
@@ -177,7 +165,6 @@ The function above generates the following subject names:
 - `topic1/v1/model.proto` → `topic1.model.v1`
 - `topic1/v2/data.proto` → `topic1.data.v2`
 - `topic1/v2/model.proto` → `topic1.model.v2`
-- `topic2/v1.0/data2.proto` → `topic2.data2.v1.0`
 - `common/v1/entity.proto` → `common.entity.v1`
 
 ## Future Plans and Roadmap
