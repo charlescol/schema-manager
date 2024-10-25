@@ -118,11 +118,10 @@ example-schemas/
 ### Schema Registration Order:
 
 1. **Step 1**: `entity.proto` in `common/v1` is registered first because `model.proto` depends on it.
-1. **Step 2**: `data.proto` from `topic1/v2`, which depends on `entity.proto` from `v1`, is registered.
+1. **Step 2**: `data.proto` from `topic1/v2`, which depends on `entity.proto`
 1. **Step 3**: `data.proto` in `topic1/v1` is registered first because `model.proto` depends on it.
-1. **Step 4**: `data2.proto` in `topic2/v1` is independent and is registered next.
 1. **Step 5**: Once `data.proto` in `topic1/v1` is registered, `model.proto` from `topic1/v1` can be registered.
-1. **Step 6**: Finally, `model.proto` from `topic1/v2`, which depends on `data.proto` from `v2`, is registered.
+1. **Step 6**: Finally, `model.proto` from `topic1/v2`, which depends on `data.proto` from `v2`, is registered (a new subject is generated for each version).
 
 ### How It Works
 
@@ -186,7 +185,7 @@ The function above generates the following subject names:
 We plan to extend Schema Manager to support:
 
 - Support for **other schema registries** beyond Confluent Schema Registry.
-- Addition of **JSON Schema** format, alongside Protobuf and Avro.
+- Addition of bigger set of supported formats, alongside the existing parsers.
 - A command-line interface (CLI) to manage schemas and visualize dependencies more easily.
 
 ## Example of Integration with Schema Manager
