@@ -1,6 +1,6 @@
 # Schema Manager
 
-## Automating Schema Versioning and Dependency Management for Schema Files
+## Automating Schema Versioning and Dependency Management
 
 ### Introduction
 
@@ -9,6 +9,8 @@ In modern microservices architectures, separating concerns is critical for scala
 Schema Manager solves this by centralizing schema management and delegation. Instead of allowing microservices to handle schema publication directly, Schema Manager automates the versioning, dependency resolution, and registration of schemas in a centralized repository. This approach keeps microservices lightweight, while Schema Manager handles all the complexity of schema registration and lifecycle management.
 
 By enforcing this separation of concerns, Schema Manager simplifies schema management across services, making the system more scalable, consistent, and reliable.
+
+An example of integration for Schema Manager in managing all the schemas in a Kafka-oriented application involving multiple microservices can be found in the [Example of Integration with Schema Manager](#example-of-integration-with-schema-manager) section.
 
 ### Quick Start
 
@@ -29,10 +31,22 @@ After installation, organize your schema files in versioned directories and crea
 - **Configurable for Confluent Schema Registry:** Seamless integration with Confluent Schema Registry, easily extendable to other registries.
 - **Error Handling and Logging:** It includes error handling for unresolved imports, cyclic dependencies, and failed schema registrations. It logs detailed error messages to help you quickly identify and fix issues.
 
-## Limitations
+## Available Parsers
 
-- Currently only supports **Confluent Schema Registry**, but the tool is designed to be easily extendable to other registries.
-- Supports **Protobuf** and **Avro** schema format at this time. The tool is designed to be easily extendable and **JSON Schema** support is planned for future releases.
+| **Parser**   | **Class Name**   | **Supported Formats** | **Description**                                                                             |
+| ------------ | ---------------- | --------------------- | ------------------------------------------------------------------------------------------- |
+| **Avro**     | `AvroParser`     | `.avro`, `.avsc`      | Parses Avro schema files, supports extracting dependencies from `.avro` and `.avsc` files.  |
+| **Protobuf** | `ProtobufParser` | `.proto`              | Parses Protobuf schema files, identifies package names and imports to resolve dependencies. |
+
+Please refer to the [Parser Documentation](how-to/create-parser.md) for more details on how to create a parser.
+
+## Available Registries
+
+| **Registry**                  | **Class Name**      | **Supported Registries** |
+| ----------------------------- | ------------------- | ------------------------ |
+| **Confluent Schema Registry** | `ConfluentRegistry` | Confluent Kafka          |
+
+Please refer to the [Registry Documentation](how-to/create-registry.md) for more details on how to create a registry.
 
 ## Scenario Example
 
@@ -174,6 +188,32 @@ We plan to extend Schema Manager to support:
 - Support for **other schema registries** beyond Confluent Schema Registry.
 - Addition of **JSON Schema** format, alongside Protobuf and Avro.
 - A command-line interface (CLI) to manage schemas and visualize dependencies more easily.
+
+## Example of Integration with Schema Manager
+
+A common use case for Schema Manager is managing all the schemas in a Kafka-oriented application involving multiple microservices.
+
+By using a **centralized schema registry**, you eliminate the need for each microservice to manage schemas independently or duplicate schema code across the services. Instead, each microservice only retrieves the schemas it needs from the centralized registry.
+
+The centralized schema repository is stored in a dedicated repository, which includes an NPM integration to allow microservices to easily include and work with the project. A small script (like the one provided in the **Quick Start** section) is used to automatically register and update the schemas. Whenever a change is detected in the `versions.json` file within the schema directory, this can trigger a new build and schema registration, typically through a CI/CD pipeline.
+
+### Workflow Example:
+
+1. **Centralized Schema Management**: The schema repository is versioned and stored in a central repository. Any changes to the schemas (tracked in `versions.json`) will trigger a new schema build and registration.
+2. **Microservice Schema Consumption**: Each microservice maintains a reference to the schemas it uses. For example, a `schemas.json` file located at the root of each microservice contains a list of schema subjects used by that service.
+3. **Schema Retrieval and Code Generation**: The `schemas.json` file is used to retrieve the latest version of each schema from the centralized registry. The schema code is then generated and can be used for development and serialization purposes.
+4. **Serialization**: Tools like `kafka-protobuf-serializer` (for Java) or `@kafkajs/confluent-schema-registry` (for JavaScript) can be used to ensure that the data is serialized using the latest version of the schema, as retrieved from the registry regardless of the entity generated in the previous step.
+
+### Benefits:
+
+- **Simplified Schema Management**: All schemas are managed in one place, avoiding duplication and inconsistencies across services.
+- **Automation and Consistency**: CI/CD integration ensures that schema updates are automatically built and registered.
+- **Versioning and Compatibility**: Each microservice always has access to the latest version of the schemas, while schema changes can be version-controlled and managed centrally.
+
+## Contributing
+
+Contributions are welcome! If you have any suggestions or improvements, please open an issue or submit a pull request.
+To contribute to this project, please refer to the [Contributing Guide](CONTRIBUTING.md) and the [how-to](how-to/overview.md) directory.
 
 ## License
 
