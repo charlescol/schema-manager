@@ -8,6 +8,8 @@ In modern microservices architectures, separating concerns is critical for scala
 
 Schema Manager solves this by centralizing schema management and delegation. Instead of allowing microservices to handle schema publication directly, Schema Manager automates the versioning, dependency resolution, and registration of schemas in a centralized repository. This approach keeps microservices lightweight, while Schema Manager handles all the complexity of schema registration and lifecycle management.
 
+This is important to note that Schema Manager is not intended to replace the schema Registry. Instead, it acts as a management layer that centralizes schemas in a single repository and automates their publication to the target registry.
+
 By enforcing this separation of concerns, Schema Manager simplifies schema management across services, making the system more scalable, consistent, and reliable.
 
 An example of integration for Schema Manager in managing all the schemas in a Kafka-oriented application involving multiple microservices can be found in the [Example of Integration with Schema Manager](#example-of-integration-with-schema-manager) section.
