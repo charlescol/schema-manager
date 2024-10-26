@@ -159,6 +159,12 @@ The `subjectBuilder` function is responsible for generating the subject name for
 - **versions: `string[]`:** An array containing all the version names where the file is included (e.g., `['v1', 'v2']`).
 - **filepath: `string`:** This is the relative file path of the schema file (e.g., `example-schemas/v1/model.proto`).
 
+If the file above is saved as `publish-schemas.ts`, you can run it with the following command to compile and execute it:
+
+```bash
+tsc && node dist/publish-schemas.js
+```
+
 **Example Subject Names:**
 
 The function above generates the following subject names:
