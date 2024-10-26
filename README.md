@@ -183,13 +183,13 @@ A common use case for Schema Manager is managing all the schemas in a Kafka-orie
 
 By using a **centralized schema registry**, you eliminate the need for each microservice to manage schemas independently or duplicate schema code across the services. Instead, each microservice only retrieves the schemas it needs from the centralized registry.
 
-The centralized schema repository is stored in a dedicated repository, which includes an NPM integration to allow microservices to easily include and work with the project. A small script (like the one provided in the **Quick Start** section) is used to automatically register and update the schemas. Whenever a change is detected in the `versions.json` file within the schema directory, this can trigger a new build and schema registration, typically through a CI/CD pipeline.
+The centralized schema repository is stored in a dedicated repository, which includes an NPM integration to include the Schema Manager. A small script (like the one provided in the [Scenario Example](#usage-example) section) is used to automatically register and update the schemas. Whenever a change is detected in the `versions.json` file within the schema directory, this can trigger a new build and schema registration, typically through a CI/CD pipeline.
 
 ### Workflow Example:
 
-1. **Centralized Schema Management**: The schema repository is versioned and stored in a central repository. Any changes to the schemas (tracked in `versions.json`) will trigger a new schema build and registration.
+1. **Centralized Schema Management**: The schema repository is versioned and stored in a central repository. Any changes to the schemas (tracked in `versions.json`) will trigger a new schema build and registration in Confluent Schema Registry.
 2. **Microservice Schema Consumption**: Each microservice maintains a reference to the schemas it uses. For example, a `schemas.json` file located at the root of each microservice contains a list of schema subjects used by that service.
-3. **Schema Retrieval and Code Generation**: The `schemas.json` file is used to retrieve the latest version of each schema from the centralized registry. The schema code is then generated and can be used for development and serialization purposes.
+3. **Schema Retrieval and Code Generation**: The `schemas.json` file is used to retrieve the latest version of each schema from the Confluent Schema Registry. The schema code is then generated and can be used for development purpose.
 4. **Serialization**: Tools like `kafka-protobuf-serializer` (for Java) or `@kafkajs/confluent-schema-registry` (for JavaScript) can be used to ensure that the data is serialized using the latest version of the schema, as retrieved from the registry regardless of the entity generated in the previous step.
 
 ### Benefits:
