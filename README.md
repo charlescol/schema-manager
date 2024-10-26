@@ -133,9 +133,20 @@ import { ConfluentRegistry, Manager, ProtobufParser } from '@charlescol/schema-m
 import * as path from 'path';
 
 const registry = new ConfluentRegistry({
-  schemaRegistryUrl: 'http://localhost:8081',
+  schemaRegistryUrl: SCHEMA_REGISTRY_URL,
+  // Below part is optional, used to override queries to the schema registry
+  body: {
+    compatibilityGroup: 'application.major.version',
+  },
+  queryParams: {
+    normalize: true,
+  },
+  headers: {
+    'Content-Type': 'application/vnd.schemaregistry.v1+json', // Default value is application/json
+  },
 });
-const baseDirectory = path.resolve(__dirname, '../schemas');
+
+const baseDirectory = path.resolve(__dirname, '../schemas'); // Path to the directory containing your schemas
 
 const manager = new Manager(registry, new ProtobufParser());
 
