@@ -56,11 +56,7 @@ Consider a system managing a set of Protobuf schemas for an event-driven archite
 
 **Note:** Multiple examples, including those mentioned here with different schema types (Protobuf, Avro, etc.), are located within the repository at `./examples`. These examples showcase various use cases and help demonstrate how Schema Manager resolves dependencies and registers schemas for different schema formats. You can explore these to better understand how to set up your own schema management workflow.
 
-In this example, we have two topics, topic1 and topic2, as well as a common namespace. Each topic contains multiple versions of schema files, with version mapping handled through versions.json files. Schema Manager supports both standard version numbers (e.g., v1, v2) and custom version strings (e.g., v1.0, alpha, beta). This allows flexibility in version naming, while Schema Manager handles versioning and dependency resolution across topics and versions
-
-**Note:** A single versions.json could have been used to manage all the topics in a centralized way. Additionally, Schema Manager supports multiple versions.json files within the same directory.
-
-**Note2:** The schema name must be unique across a given version of a topic (this include all the dependencies referenced in the versions.json file for the version).
+In this example, we have one topic "topic1" as well as a common namespace. Our topic contains multiple versions of schema files, with version mapping handled through versions.json files.
 
 **File Structure:**
 
@@ -104,6 +100,12 @@ example-schemas/
   }
 }
 ```
+
+Schema Manager supports both standard version numbers (e.g., v1, v2) and custom version strings (e.g., v1.0, alpha, beta). This allows flexibility in version naming, while Schema Manager handles versioning and dependency resolution across topics and versions
+
+**Note:** A single versions.json could have been used to manage all the topics in a centralized way. Additionally, Schema Manager supports multiple versions.json files within the same directory.
+
+**Note2:** The schema name must be unique across a given version of a topic (this include all the dependencies referenced in the versions.json file for the version).
 
 ### Schema Registration Order:
 

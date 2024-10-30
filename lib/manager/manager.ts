@@ -12,16 +12,16 @@ export default class Manager {
     this.versionDataExtractor = new VersionsExtractor();
   }
   /**
-   * Loads all Protobuf schemas from the specified directory, processes them, and registers them
+   * Loads all schemas from the specified directory, processes them, and registers them
    * with the schema registry in topologically sorted order.
    *
    * This method:
    * 1. Extracts version data from the directory (`versions.json` files).
-   * 2. Processes `.proto` files and their dependencies.
+   * 2. Processes files and their dependencies.
    * 3. Sorts them topologically to ensure that all dependencies are registered in the correct order.
-   * 4. Registers each `.proto` file with the schema registry
+   * 4. Registers each file with the schema registry
    *
-   * @param {string} baseDirectory - The root directory containing the `.proto` files and `versions.json` files.
+   * @param {string} baseDirectory - The root directory containing the files and `versions.json` files.
    * @param {(versions: string[], filepath: string) => string} subjectBuilder - A function to build the subject name for each schema. Takes the file's versions and filepath as arguments.
    * @returns {Promise<void>} - A promise that resolves when all schemas have been registered.
    * @throws {Error} - If any dependencies cannot be resolved or if schema registration fails.
