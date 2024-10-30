@@ -37,8 +37,8 @@ export default class Manager {
     const subjects = new Map<string, string>();
 
     for (const filepath of order) {
-      const protoPath = path.join(baseDirectory, filepath);
-      const protoContent = fs.readFileSync(protoPath, 'utf-8');
+      const fullPath = path.join(baseDirectory, filepath);
+      const fileContent = fs.readFileSync(fullPath, 'utf-8');
 
       const references = this.schemaRegistry.buildReferences(
         filepath,
@@ -53,11 +53,11 @@ export default class Manager {
       subjects.set(filepath, formattedSubject);
       await this.schemaRegistry.registerSchema(
         formattedSubject,
-        protoContent,
+        fileContent,
         references,
         this.parser.getSchemaType(filepath),
       );
-      console.log(`Registered proto schema for ${formattedSubject}`);
+      console.log(`Registered schema for ${formattedSubject}`);
     }
   }
 }

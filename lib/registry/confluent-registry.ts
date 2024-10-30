@@ -33,7 +33,7 @@ export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistr
       );
       return response.data;
     } catch (error) {
-      console.error(`Failed to register proto schema for subject ${subject}`, error);
+      console.error(`Failed to register schema for subject ${subject}`, error);
       throw error;
     }
   }
