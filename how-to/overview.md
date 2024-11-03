@@ -6,6 +6,14 @@ This document outlines the key components and flow of the schema registration pr
 
 ---
 
+## **Diagram**
+
+Here’s a high-level flow of the schema registration process:
+
+![Schema Manager Diagram](assets/overview-diagram.png)
+
+---
+
 ## **Flow of the Registration Process**
 
 The registration process consists of four main steps, each handled by specific components of the Schema Manager:
@@ -34,12 +42,6 @@ The registration process consists of four main steps, each handled by specific c
 
    See: [How to Create a Registry](create-registry.md) for more details.
 
-## **Diagram**
-
-Here’s a high-level flow of the schema registration process:
-
-![Schema Manager Diagram](assets/overview-diagram.png)
-
 ---
 
 ## **Extensibility**
@@ -50,3 +52,105 @@ Both the **Parser** and **Schemas Registry** components are designed to be exten
 - To extend the registry, follow the guide: [create-registry.md](create-registry.md)
 
 ---
+
+## **Detailed Input Output\***
+
+Consider a similar example as the one specified in the [Scenario Example](README.md#scenario-example) section in the README.
+
+```bash
+example-schemas/
+  ├── topic1/
+  │   ├── v1/
+  │   │   ├── data.proto         # Schema for v1 data of topic1
+  │   │   └── model.proto        # Schema for v1 model (depends on topic1/v1/data.proto)
+  │   ├── v2/
+  │   │   └── data.proto         # Schema for v2 data (depends on ./common/v1/entity.proto)
+  │   └── versions.json          # Version mapping for topic1 (v1 and v2)
+  ├── common/
+  │   ├── v1/
+  │   │   └── entity.proto       # Schema for test entity
+```
+
+**versions.json for topic1:**
+
+```json
+{
+  "v1": {
+    "data": "v1/data.proto",
+    "model": "v1/model.proto"
+  },
+  "v2": {
+    "data": "v2/data.proto",
+    "model": "v1/model.proto",
+    "entity": "../common/v1/entity.proto"
+  }
+}
+```
+
+### Versions Extraction Output
+
+The versions extraction will return the following objects:
+
+```typescript
+// FileMap (Map of file path to an array of version objects). version is the key in the versions.json file and full is directory of the versions.json with the key at the end {directory}/{version}
+Map(6) {
+  'common/v1/entity.proto' => [
+    { version: 'v2', full: 'topic1/v2' }
+  ],
+  'topic1/v1/data.proto' => [ { version: 'v1', full: 'topic1/v1' } ],
+  'topic1/v1/model.proto' => [
+    { version: 'v1', full: 'topic1/v1' },
+    { version: 'v2', full: 'topic1/v2' }
+  ],
+  'topic1/v2/data.proto' => [ { version: 'v2', full: 'topic1/v2' } ],
+}
+
+// VersionMap (Map of version directories + version name {directory}/{version}, to their mapping)
+Map(5) {
+  'topic1/v1' => Map(2) {
+    'data' => 'topic1/v1/data.proto',
+    'model' => 'topic1/v1/model.proto'
+  },
+  'topic1/v2' => Map(3) {
+    'data' => 'topic1/v2/data.proto',
+    'model' => 'topic1/v1/model.proto',
+    'entity' => 'common/v1/entity.proto'
+  }
+}
+```
+
+### Parser Output
+
+```typescript
+{
+  // Used to map each file to all its dependencies, this is used to order the file registration
+  dependenciesMap: Map(6) {
+    'common/v1/entity.proto' => [],
+    'topic1/v1/data.proto' => [],
+    'topic1/v1/model.proto' => [ 'topic1/v1/data.proto', 'topic1/v2/data.proto' ],
+    'topic1/v2/data.proto' => [ 'common/v1/entity.proto' ]
+  },
+  // Used to map each file to its fully qualified namespace or identifier, this is used to format the dependency names for the registry
+  namespaceMap: Map(6) {
+    'common/v1/entity.proto' => 'common.Entity',
+    'topic1/v1/data.proto' => 'topic1.Data',
+    'topic1/v1/model.proto' => 'topic1.Model',
+    'topic1/v2/data.proto' => 'topic1.Data'
+  },
+  // Used to map each file to a map of versions and their specific dependencies, topic1/v1/model.proto has two versions for the same file meaning that two different schemas need to be registered for the same file
+  dependenciesPartionnedMap: Map(6) {
+    'common/v1/entity.proto' => Map(2) { 'topic1/v2' => [] },
+    'topic1/v1/data.proto' => Map(1) { 'topic1/v1' => [] },
+    'topic1/v1/model.proto' => Map(2) { 'topic1/v1' => [Array], 'topic1/v2' => [Array] },
+    'topic1/v2/data.proto' => Map(1) { 'topic1/v2' => [Array] }
+  }
+}
+```
+
+### Topological Sorting Output
+
+The topological sorting will return the following array:
+
+```typescript
+['common/v1/entity.proto', 'topic1/v1/data.proto', 'topic1/v2/data.proto', 'topic1/v1/model.proto'];
+```
