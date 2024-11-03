@@ -5,4 +5,5 @@ export { default as AvroParser } from './parser/avro-parser';
 export { default as AbstractParser } from './parser/abstract-parser';
 export { default as ConfluentRegistry } from './registry/confluent-registry';
 export * from './registry/types';
+export * from './manager/types';
 export * from './types';
