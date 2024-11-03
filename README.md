@@ -181,11 +181,14 @@ const registry = new ConfluentRegistry({
   },
 });
 
-// create a manager and load all schemas
-await new Manager({
-  schemaRegistry: registry,
-  parser: new ProtobufParser(),
-}).loadAll(baseDirectory, subjectBuilder);
+async function main() {
+  // create a manager and load all schemas
+  const manager = new Manager({
+    schemaRegistry: registry,
+    parser: new ProtobufParser(),
+  });
+  await manager.loadAll(baseDirectory, subjectBuilder);
+}
 
 // Function to provide, used to build the subject for each schema file.
 // This is an example implementation, you can customize it based on your own versioning and naming rules.
@@ -197,6 +200,11 @@ function subjectBuilder(fullVersionPath: string, filepath: string): string {
   // Return the constructed subject
   return `${topic}.${filename}.${version}`;
 }
+
+main().catch((error) => {
+  console.error('Error registering schemas:', error);
+  process.exit(1);
+});
 ```
 
 The `subjectBuilder` function is responsible for generating the subject name for each schema that is registered in the schema registry. The subject is a unique identifier used by the registry to track schema versions and manage updates. The function takes two parameters:
