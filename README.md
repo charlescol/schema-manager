@@ -209,7 +209,7 @@ main().catch((error) => {
 
 The `subjectBuilder` function is responsible for generating the subject name for each schema that is registered in the schema registry. The subject is a unique identifier used by the registry to track schema versions and manage updates. The function takes two parameters:
 
-- **fullVersionPath: `string`:** The path to the version directory with the version name {pathToVersion}/{versionName} (e.g., `topic1/v1`).
+- **fullVersionPath: `string`:** The path to the versions.json directory with the version name (key in the json) {pathToVersion}/{versionName} (e.g., `topic1/v1`).
 - **filepath: `string`:** This is the relative file path of the schema file (e.g., `example-schemas/v1/model.proto`).
 
 The function above generates the following subject names for the topic1 (`fullVersionPath`, `filepath` → `generated subject`):
