@@ -141,7 +141,7 @@ Map(5) {
   dependenciesPartionnedMap: Map(6) {
     'common/v1/entity.proto' => Map(2) { 'topic1/v2' => [] },
     'topic1/v1/data.proto' => Map(1) { 'topic1/v1' => [] },
-    'topic1/v1/model.proto' => Map(2) { 'topic1/v1' => [Array], 'topic1/v2' => [Array] },
+    'topic1/v1/model.proto' => Map(2) { 'topic1/v1' => ['topic1/v1/data.proto'], 'topic1/v2' => ['topic1/v2/data.proto'] },
     'topic1/v2/data.proto' => Map(1) { 'topic1/v2' => [Array] }
   }
 }
