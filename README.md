@@ -116,7 +116,7 @@ It is important to note that the schema manager handles implicit file import. Th
 
 **Note:** You can force the file to be published only once by using the EXPLICIT mode, in this example this would raise an error because the model.proto and entity.proto files are imported twice.
 
-In our case adding a versions.json in the common directory is not necessary because we don't need a subject for this directory.
+In our case adding a versions.json in the common directory is not necessary because common directory are not meant to be registered as separate subjects in the schema registry. Instead, they serve as shared dependencies that are imported by other schemas located in the service-specific directories.
 
 **versions.json for topic1:**
 
@@ -201,16 +201,16 @@ function subjectBuilder(fullVersionPath: string, filepath: string): string {
 
 The `subjectBuilder` function is responsible for generating the subject name for each schema that is registered in the schema registry. The subject is a unique identifier used by the registry to track schema versions and manage updates. The function takes two parameters:
 
-- **version: `string`:** The path to the version directory with the version name {pathToVersion}/{versionName} (e.g., `topic1/v1`).
+- **fullVersionPath: `string`:** The path to the version directory with the version name {pathToVersion}/{versionName} (e.g., `topic1/v1`).
 - **filepath: `string`:** This is the relative file path of the schema file (e.g., `example-schemas/v1/model.proto`).
 
-The function above generates the following subject names for the topic1:
+The function above generates the following subject names for the topic1 (`fullVersionPath`, `filepath` → `generated subject`):
 
-- `topic1/v1/data.proto` → `topic1.data.v1`
-- `topic1/v1/model.proto` → `topic1.model.v1`
-- `topic1/v2/data.proto` → `topic1.data.v2`
-- `topic1/v2/model.proto` → `topic1.model.v2`
-- `topic1/v2/entity.proto` → `topic1.entity.v2`
+- `topic1/v1`, `topic1/v1/data.proto` → `topic1.data.v1`
+- `topic1/v1`, `topic1/v1/model.proto` → `topic1.model.v1`
+- `topic1/v2`, `topic1/v2/data.proto` → `topic1.data.v2`
+- `topic1/v2`, `topic1/v1/model.proto` → `topic1.model.v2`
+- `topic1/v2`, `common/v1/entity.proto` → `topic1.entity.v2`
 
 If the file above is saved as `publish-schemas.ts`, you can run it with the following command to compile and execute it:
 
