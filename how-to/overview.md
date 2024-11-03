@@ -55,7 +55,7 @@ Both the **Parser** and **Schemas Registry** components are designed to be exten
 
 ## **Detailed Input Output\***
 
-Consider a similar example as the one specified in the [Scenario Example](README.md#scenario-example) section in the README.
+Consider a similar example as the one specified in the [Scenario Example](../README.md#scenario-example) section in the README.
 
 ```bash
 example-schemas/
