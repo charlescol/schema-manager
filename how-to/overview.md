@@ -154,3 +154,7 @@ The topological sorting will return the following array:
 ```typescript
 ['common/v1/entity.proto', 'topic1/v1/data.proto', 'topic1/v2/data.proto', 'topic1/v1/model.proto'];
 ```
+
+### Manager
+
+The Manager will then use the array from the topological sorting output, along with the `namespaceMap` and `dependenciesPartitionedMap` from the Parser output, to publish the schemas
