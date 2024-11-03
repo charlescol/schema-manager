@@ -69,16 +69,15 @@ schemaType: SchemaType,
 
 ### Implement the buildReferences Method
 
-The buildReferences method creates an array of references for the schema based on its dependencies. It looks up the dependencies in dependenciesMap and retrieves their namespaces from namespaceMap, then maps them to their corresponding subjects.
+The buildReferences method creates an array of references for the schema based on its dependencies. It looks up the dependencies and retrieves their namespaces from namespaceMap, then maps them to their corresponding subjects.
 
 ```typescript
   public buildReferences(
     filepath: string,
-    dependenciesMap: DependenciesMap,
+    dependencies: string[],
     namespaceMap: NamespaceMap,
     subjects: Map<string, string>,
   ): ConfluentRegistryReference[] {
-    const dependencies = dependenciesMap.get(filepath);
     if (!dependencies) throw new Error(`Subject ${filepath} is not registered`);
     const references = [];
     for (const dependency of dependencies) {
