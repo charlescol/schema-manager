@@ -4,3 +4,8 @@ export type VersionData = {
   fileMap: FileMap;
   versionMap: VersionMap;
 };
+
+export enum DependencyResolutionMode {
+  IMPLICIT = 'IMPLICIT',
+  EXPLICIT = 'EXPLICIT',
+}

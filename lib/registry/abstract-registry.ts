@@ -33,14 +33,14 @@ export default abstract class AbstractRegistry<TRef> {
    * namespaces from `namespaceMap`, and associating them with their corresponding subjects in the `subjects` map.
    *
    * @param filepath The path of the schema file for which references are being built
-   * @param dependenciesMap A map that lists the dependencies for each schema file
+   * @param dependencies Dependencies list for the current schema file
    * @param namespaceMap A map that associates each schema file with its namespace or identifier
    * @param subjects A map that contains the subject for each schema file
    * @returns {*} An array of references to other schemas that the current schema depends on
    */
   public abstract buildReferences(
     filepath: string,
-    dependenciesMap: DependenciesMap,
+    dependencies: string[],
     namespaceMap: NamespaceMap,
     subjects: Map<string, string>,
   ): TRef[];

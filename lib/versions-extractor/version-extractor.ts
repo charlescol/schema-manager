@@ -1,8 +1,18 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { FileMap, VersionData, VersionMap } from './types';
+import { DependencyResolutionMode, FileMap, VersionData, VersionMap } from './types';
 
 export default class VersionsExtractor {
+  constructor(dependencyResolutionMode: DependencyResolutionMode = DependencyResolutionMode.IMPLICIT) {
+    this.dependencyResolutionMode = dependencyResolutionMode;
+  }
+  /**
+   * The dependency resolution mode to use. If EXPLICIT, this forces each file to be referenced in a unique version.
+   */
+  private readonly dependencyResolutionMode: DependencyResolutionMode;
+  /**
+   * The base directory to scan for versions.json files.
+   */
   private baseDirectory: string;
   /**
    * Extracts version data from the provided base directory.
@@ -105,6 +115,8 @@ export default class VersionsExtractor {
         const relativeFullPath = path.relative(this.baseDirectory, fullPath);
         if (!fileMap.has(relativeFullPath)) {
           fileMap.set(relativeFullPath, []);
+        } else if (this.dependencyResolutionMode === DependencyResolutionMode.EXPLICIT) {
+          throw new Error(`Implicit dependency resolution is not supported for ${relativeFullPath}`);
         }
         fileMap.get(relativeFullPath)!.push({ version, full: fullVersionPath });
         versionMap.get(fullVersionPath)!.set(file.toLowerCase(), relativeFullPath);
