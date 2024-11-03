@@ -6,6 +6,25 @@ import ProtobufParser from '../dist/parser/protobuf-parser';
 import AvroParser from '../dist/parser/avro-parser';
 import SchemaType from '../dist/types';
 
+/*
+ * This file is used for running examples in a development environment only;
+ * it is not distributed with the package.
+ *
+ * Purpose:
+ * - The provided objects are imported from the `dist` folder. To apply changes,
+ *   ensure that you run the build command after making modifications.
+ *
+ * Configuration:
+ * - The following environment variables are used:
+ *   - `SCHEMA_REGISTRY_URL`: Configures the `ConfluentRegistry` instance.
+ *   - `SCHEMA_DIR`: Specifies the directory where schemas are located.
+ *
+ * Running:
+ * - Use the following commands to run this file with specific presets:
+ *   - `yarn run run:protobuf` for the Protobuf preset
+ *   - `yarn run run:avro` for the Avro preset
+ */
+
 (async () => {
   const SCHEMA_REGISTRY_URL = 'http://localhost:8081';
   const SCHEMA_DIR = path.resolve(__dirname, '../examples');

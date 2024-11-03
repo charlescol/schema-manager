@@ -50,6 +50,40 @@ Please refer to the [Parser Documentation](how-to/create-parser.md) for more det
 
 Please refer to the [Registry Documentation](how-to/create-registry.md) for more details on how to create a registry.
 
+## Manager Parameters
+
+Below the parameters that can be passed to the `Manager` constructor.
+
+| Parameter                  | Type                       | Description                                                                                                                            | Required |
+| -------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `schemaRegistry`           | `AbstractRegistry`         | The schema registry to use for registering schemas.                                                                                    | Yes      |
+| `parser`                   | `AbstractParser`           | The parser to use for parsing schema files.                                                                                            | Yes      |
+| `dependencyResolutionMode` | `DependencyResolutionMode` | The dependency resolution mode to use. Defaults to `IMPLICIT`. Set to `EXPLICIT` to enforce each file's inclusion in only one version. | No       |
+
+## Registry Parameters
+
+Below the parameters that can be passed to the `AbstractRegistry` constructor.
+
+| Parameter           | Type                      | Description                                         | Required |
+| ------------------- | ------------------------- | --------------------------------------------------- | -------- |
+| `schemaRegistryUrl` | `string`                  | The URL of the schema registry.                     | Yes      |
+| `headers`           | `Record<string, unknown>` | Additional headers to include in requests.          | No       |
+| `body`              | `Record<string, unknown>` | Additional body parameters to include in requests.  | No       |
+| `queryParams`       | `Record<string, unknown>` | Additional query parameters to include in requests. | No       |
+
+### How It Works
+
+1. **Organize Your Schemas:**
+
+   - Place your files in versioned directories (e.g., v1, v2) and map them in `versions.json`.
+
+2. **Run Schema Manager:**
+
+   - Schema Manager parses .proto files to detect import and package statements. Dependencies are resolved using topological sorting to ensure schemas are registered in the correct order.
+
+3. **Automated Registration:**
+   - Once dependencies are resolved, Schema Manager registers the schemas with the schema registry in the correct order.
+
 ## Scenario Example
 
 Consider a system managing a set of Protobuf schemas for an event-driven architecture. Each schema has multiple versions and dependencies.
@@ -69,11 +103,18 @@ example-schemas/
   │   ├── v2/
   │   │   └── data.proto         # Schema for v2 data (depends on ./common/v1/entity.proto)
   │   └── versions.json          # Version mapping for topic1 (v1 and v2)
+  ├── topic2/
+  │   ├── v1/
+  │   │   └── data2.proto        # Schema for v1 data2 of topic2 (depends on ./common/v1/entity.proto)
+  │   └── versions.json          # Version mapping for topic1 (v1 and v2)
   ├── common/
   │   ├── v1/
   │   │   └── entity.proto       # Schema for test entity
-  │   └── versions.json          # Version mapping for common (v1)
 ```
+
+It is important to note that the schema manager handles implicit file import. This means that two different schemas will be published for model.proto (topic1/v1 and topic1/v2) and two different schemas will be published for entity.proto (topic1/v1 and topic2/v1) although they are the same file.
+
+**Note:** You can force the file to be published only once by using the EXPLICIT mode, in this example this would raise an error because the model.proto and entity.proto files are imported twice.
 
 **versions.json for topic1:**
 
@@ -91,12 +132,12 @@ example-schemas/
 }
 ```
 
-**versions.json for common:**
+**versions.json for topic2:**
 
 ```json
 {
   "v1": {
-    "entity": "v1/entity.proto"
+    "entity": "../common/v1/entity.proto"
   }
 }
 ```
@@ -109,30 +150,20 @@ Schema Manager supports both standard version numbers (e.g., v1, v2) and custom 
 
 ### Schema Registration Order:
 
-1. **Step 1**: `entity.proto` in `common/v1` is registered first because `model.proto` depends on it.
-1. **Step 2**: `data.proto` from `topic1/v2`, which depends on `entity.proto`
-1. **Step 3**: `data.proto` in `topic1/v1` is registered first because `model.proto` depends on it.
+1. **Step 1**: `entity.proto` in `topic1/v2` is registered because `data.proto` depends on it.
+1. **Step 1**: `entity.proto` in `topic2/v1` is registered because `data2.proto` depends on it.
+1. **Step 3**: `data.proto` in `topic1/v1` is registered because `model.proto` depends on it.
+1. **Step 2**: `data.proto` from `topic1/v2`, is registered because `model.proto` depends on it.
 1. **Step 5**: Once `data.proto` in `topic1/v1` is registered, `model.proto` from `topic1/v1` can be registered.
-1. **Step 6**: Finally, `model.proto` from `topic1/v2`, which depends on `data.proto` from `v2`, is registered (a new subject is generated for each version).
-
-### How It Works
-
-1. **Organize Your Schemas:**
-
-   - Place your Protobuf files in versioned directories (e.g., v1, v2) and map them in `versions.json`.
-
-2. **Run Schema Manager:**
-
-   - Schema Manager parses .proto files to detect import and package statements. Dependencies are resolved using topological sorting to ensure schemas are registered in the correct order.
-
-3. **Automated Registration:**
-   - Once dependencies are resolved, Schema Manager registers the schemas with the schema registry in the correct order.
+1. **Step 6**: Finally, `model.proto` from `topic1/v2`, which depends on `data.proto` from `v2`
 
 ### Usage Example
 
 ```typescript
 import { ConfluentRegistry, Manager, ProtobufParser } from '@charlescol/schema-manager';
 import * as path from 'path';
+
+const baseDirectory = path.resolve(__dirname, '../schemas'); // Path to the directory containing your schemas
 
 const registry = new ConfluentRegistry({
   schemaRegistryUrl: SCHEMA_REGISTRY_URL,
@@ -148,45 +179,42 @@ const registry = new ConfluentRegistry({
   },
 });
 
-const baseDirectory = path.resolve(__dirname, '../schemas'); // Path to the directory containing your schemas
-
-const manager = new Manager(registry, new ProtobufParser());
+// create a manager and load all schemas
+await new Manager({
+  schemaRegistry: registry,
+  parser: new ProtobufParser(),
+}).loadAll(baseDirectory, subjectBuilder);
 
 // Function to provide, used to build the subject for each schema file.
 // This is an example implementation, you can customize it based on your own versioning and naming rules.
-const subjectBuilder = (versions: string[], filepath: string): string => {
-  const minVersion = versions.sort()[0]; // Select the minimum version
-  return (
-    filepath
-      .replace(/\/v\d+/, '') // Remove the version directory (e.g., /v1)
-      .replace(/\.proto$/, '') // Remove the .proto file extension
-      .replace(/[/\\]/g, '.') + `.v${minVersion}` // Convert path separators to dots and append the minimum version
-  );
-};
-// Load and register all schemas
-await manager.loadAll(baseDirectory, subjectBuilder);
+function subjectBuilder(fullVersionPath: string, filepath: string): string {
+  // Extract topic and version
+  const [topic, version] = fullVersionPath.split('/');
+  // Extract the filename without extension
+  const filename = filepath.split('/').pop()?.split('.')[0] || '';
+  // Return the constructed subject
+  return `${topic}.${filename}.${version}`;
+}
 ```
 
 The `subjectBuilder` function is responsible for generating the subject name for each schema that is registered in the schema registry. The subject is a unique identifier used by the registry to track schema versions and manage updates. The function takes two parameters:
 
-- **versions: `string[]`:** An array containing all the version names where the file is included (e.g., `['v1', 'v2']`).
+- **version: `string`:** The path to the version directory with the version name {pathToVersion}/{versionName} (e.g., `topic1/v1`).
 - **filepath: `string`:** This is the relative file path of the schema file (e.g., `example-schemas/v1/model.proto`).
+
+The function above generates the following subject names for the topic1:
+
+- `topic1/v1/data.proto` → `topic1.data.v1`
+- `topic1/v1/model.proto` → `topic1.model.v1`
+- `topic1/v2/data.proto` → `topic1.data.v2`
+- `topic1/v2/model.proto` → `topic1.model.v2`
+- `topic1/v2/entity.proto` → `topic1.entity.v2`
 
 If the file above is saved as `publish-schemas.ts`, you can run it with the following command to compile and execute it:
 
 ```bash
 tsc && node dist/publish-schemas.js
 ```
-
-**Example Subject Names:**
-
-The function above generates the following subject names:
-
-- `topic1/v1/data.proto` → `topic1.data.v1`
-- `topic1/v1/model.proto` → `topic1.model.v1`
-- `topic1/v2/data.proto` → `topic1.data.v2`
-- `topic1/v2/model.proto` → `topic1.model.v2`
-- `common/v1/entity.proto` → `common.entity.v1`
 
 ## Future Plans and Roadmap
 
