@@ -116,6 +116,8 @@ It is important to note that the schema manager handles implicit file import. Th
 
 **Note:** You can force the file to be published only once by using the EXPLICIT mode, in this example this would raise an error because the model.proto and entity.proto files are imported twice.
 
+In our case adding a versions.json in the common directory is not necessary because we don't need a subject for this directory.
+
 **versions.json for topic1:**
 
 ```json
