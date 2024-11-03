@@ -39,12 +39,10 @@ export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistr
   }
 
   public buildReferences(
-    filepath: string,
     dependencies: string[],
     namespaceMap: NamespaceMap,
     subjects: Map<string, string>,
   ): ConfluentRegistryReference[] {
-    if (!dependencies) throw new Error(`Subject ${filepath} is not registered`);
     const references = [];
     for (const dependency of dependencies) {
       const name = namespaceMap.get(dependency);

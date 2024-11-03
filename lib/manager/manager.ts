@@ -44,7 +44,6 @@ export default class Manager {
 
       for (const fullVersion of partionnedDependencies.keys()) {
         const references = this.config.schemaRegistry.buildReferences(
-          filepath,
           partionnedDependencies.get(fullVersion)!,
           dependenciesResult.namespaceMap,
           subjects,
