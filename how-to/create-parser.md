@@ -48,6 +48,8 @@ protected extractDependencies(filePath: string): string[] {
 }
 ```
 
+The above function extracts dependencies from the file by searching for import statements in the file and extracting the file paths. For instance, in a Protobuf file, the import statement might look like `import "path/to/file.proto";`. The function then removes the path and the extension from the file name and returns the remaining part, which is `file`.
+
 ### Extract Name
 
 This function derives a unique identifier for the file's schema, used as the reference name in the schema registry. For instance, in Protobuf, the name corresponds to the string specified in the `import` statement, while in Avro, it is the fully qualified name, including the namespace. Each name must be unique for the schema registry to manage file versions accurately.
