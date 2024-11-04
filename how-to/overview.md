@@ -131,11 +131,11 @@ Map(5) {
     'topic1/v2/data.proto' => [ 'common/v1/entity.proto' ]
   },
   // Used to map each file to its fully qualified namespace or identifier, this is used to format the dependency names for the registry
-  namespaceMap: Map(6) {
-    'common/v1/entity.proto' => 'common.Entity',
-    'topic1/v1/data.proto' => 'topic1.Data',
-    'topic1/v1/model.proto' => 'topic1.Model',
-    'topic1/v2/data.proto' => 'topic1.Data'
+  dependenciesNameMap: Map(6) {
+    'common/v1/entity.proto' => 'entity.proto',
+    'topic1/v1/data.proto' => 'data.proto',
+    'topic1/v1/model.proto' => 'model.proto',
+    'topic1/v2/data.proto' => 'data.proto',
   },
   // Used to map each file to a map of versions and their specific dependencies, topic1/v1/model.proto has two versions for the same file meaning that two different schemas need to be registered for the same file
   dependenciesPartionnedMap: Map(6) {

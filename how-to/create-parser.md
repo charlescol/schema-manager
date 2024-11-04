@@ -64,6 +64,8 @@ This function derives a unique identifier for the file's schema, used as the ref
   }
 ```
 
+An example of the name mapping for Protobuf files with a complete example is shown in the [Overview](overview.md#parser-output) section.
+
 **In Protobuf files, the import statement should reference only the file name and not the full file path.** This is because dependency resolution is managed within the versions.json file, which allows the schema manager to dynamically assign the correct versioned dependencies for each import.
 
 The schema manager supports an implicit import mechanism, enabling the same file to be imported in multiple versions without conflict. This flexibility allows each version of a schema to maintain its own set of dependencies, even if those dependencies differ across versions.
