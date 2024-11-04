@@ -55,9 +55,9 @@ The above function extracts dependencies from the file by searching for import s
 This function derives a unique identifier for the file's schema, used as the reference name in the schema registry. For instance, in Protobuf, the name corresponds to the string specified in the `import` statement, while in Avro, it is the fully qualified name, including the namespace. Each name must be unique for the schema registry to manage file versions accurately.
 
 ```typescript
-  protected extractName(filePath: string): string {
-    return path.basename(filePath);
-  }
+protected extractName(filePath: string): string {
+  return path.basename(filePath);
+}
 ```
 
 An example of the name mapping for Protobuf files with a complete example is shown in the [Overview](overview.md#parser-output) section.

@@ -74,12 +74,12 @@ The buildReferences method creates an array of references for the schema based o
 ```typescript
   public buildReferences(
     dependencies: string[],
-    namespaceMap: NamespaceMap,
+    dependenciesNameMap: DependenciesNameMap,
     subjects: Map<string, string>,
   ): ConfluentRegistryReference[] {
     const references = [];
     for (const dependency of dependencies) {
-      const name = namespaceMap.get(dependency);
+      const name = dependenciesNameMap.get(dependency);
       if (!name) throw new Error(`Subject ${dependency} is not registered`);
       references.push({
         name,
@@ -90,6 +90,8 @@ The buildReferences method creates an array of references for the schema based o
     return references;
   }
 ```
+
+**Note:** The version is set to -1 to use the latest version of the referenced schema.
 
 ### Using the Registry
 
