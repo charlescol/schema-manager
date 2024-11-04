@@ -157,4 +157,4 @@ The topological sorting will return the following array:
 
 ### Manager
 
-The Manager will then use the array from the topological sorting output, along with the `namespaceMap` and `dependenciesPartitionedMap` from the Parser output, to publish the schemas
+The Manager will then use the array from the topological sorting output, along with the `dependenciesNameMap` and `dependenciesPartitionedMap` from the Parser output, to publish the schemas
