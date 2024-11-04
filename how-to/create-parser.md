@@ -78,22 +78,3 @@ await new Manager({
         parser: new ProtobufParser(),
       }).loadAll(...);
 ```
-
-### Handling Multiple Schema Types
-
-By default, the first schema type in the schemaTypes array is passed to the registry when working with files. However, if your parser supports multiple schema types (e.g., both Protobuf and Avro), you can override the getSchemaType method to implement custom logic based on the file type.
-
-Here’s an example of how to override getSchemaType to differentiate between Protobuf and Avro:
-
-```typescript
-public override getSchemaType(filepath: string): SchemaType {
-  if (filepath.endsWith('.avro')) {
-    return SchemaType.AVRO;
-  } else if (filepath.endsWith('.proto')) {
-    return SchemaType.PROTOBUF;
-  } else if (!this.schemaTypes.length) {
-    throw new Error('No schema type specified, need to specify at least one schema type');
-  }
-  return this.schemaTypes[0]; // Default to the first schema type if no match is found
-}
-```
