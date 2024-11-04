@@ -6,18 +6,29 @@ import SchemaType from '../types';
 
 export default abstract class AbstractParser {
   /**
-   * An array of file extensions that should be processed by this parser.
-   *
-   * Specify the file types the parser is designed to handle.
-   * For example, a subclass handling `.proto` files might set this to `['.proto']`.
-   * Other parsers might handle `.json`, `.xml`, or any other file types by setting appropriate extensions.
+   * A map of file extensions to their corresponding schema types. You can extend this map to support additional file types.
+   * This is case-insensitive, meaning that the file extension should be lowercase.
+   * @static
    */
-  protected abstract readonly extensions: string[];
+  protected static readonly extensionToSchemaType: { [key: string]: SchemaType } = {
+    '.avsc': SchemaType.AVRO,
+    '.avro': SchemaType.AVRO,
+    '.proto': SchemaType.PROTOBUF,
+    '.json': SchemaType.JSON,
+    '.xml': SchemaType.XML,
+    '.thrift': SchemaType.THRIFT,
+    '.msgpack': SchemaType.MESSAGEPACK,
+    '.mpk': SchemaType.MESSAGEPACK,
+    '.fbs': SchemaType.FLATBUFFERS,
+    '.yaml': SchemaType.YAML,
+    '.yml': SchemaType.YAML,
+    '.cbor': SchemaType.CBOR,
+  };
   /**
    * An array of schema types that are supported by the parser.
    * This is used in the `getSchemaType` method to determine the appropriate schema for a given file.
    */
-  protected abstract readonly schemaTypes: SchemaType[];
+  protected abstract readonly schemaTypes: string[];
   /**
    * Extracts dependencies names from a given file.
    *
@@ -56,7 +67,8 @@ export default abstract class AbstractParser {
       if (entry.isDirectory()) {
         this.getFiles(fullPath, files);
       } else if (entry.isFile()) {
-        if (this.extensions.some((ext) => fullPath.endsWith(ext))) {
+        const schemaType = this.getSchemaType(fullPath);
+        if (schemaType !== SchemaType.UNKNOWN && this.schemaTypes.includes(schemaType)) {
           files.push(fullPath);
         }
       }
@@ -64,21 +76,14 @@ export default abstract class AbstractParser {
     return files;
   }
   /**
-   * Default implementation to return the schema type for a given file path.
-   *
-   * This method provides a default behavior by returning the first schema type in the list of supported schema types.
-   * It can be overridden by subclasses if a more specific schema type needs to be determined based on the file path or contents.
-   * If no schema types are defined, it throws an error, ensuring at least one schema type must be configured.
+   * This method returns the schema type for a given file path. If the schema type is not supported, it returns `SchemaType.UNKNOWN`.
    *
    * @param {string} filepath - The path to the file being processed.
    * @returns {SchemaType} - The schema type associated with the given file.
-   * @throws {Error} - If no schema type is specified for the parser.
    */
   public getSchemaType(filepath: string): SchemaType {
-    if (!this.schemaTypes.length) {
-      throw new Error(`No schema type specified, need to specify at least one schema type`);
-    }
-    return this.schemaTypes[0];
+    const fileExtension = path.extname(filepath).toLowerCase();
+    return AbstractParser.extensionToSchemaType[fileExtension] || SchemaType.UNKNOWN;
   }
   /**
    * Processes files to map dependencies and namespaces/identifiers.

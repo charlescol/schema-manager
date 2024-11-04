@@ -18,14 +18,6 @@ The first step is to create a new parser class that extends the AbstractParser c
 export default class ProtobufParser extends AbstractParser
 ```
 
-### Define File Extensions
-
-Define the file extensions that your parser will handle. For example, the Protobuf parser processes .proto files:
-
-```typescript
-protected extensions = ['.proto'];
-```
-
 ### Define Schema Types
 
 Specify the schema types that your parser supports. In this example, the parser supports Protobuf schemas:
@@ -33,6 +25,8 @@ Specify the schema types that your parser supports. In this example, the parser 
 ```typescript
 protected schemaTypes = [SchemaType.PROTOBUF];
 ```
+
+The schema manager supports many schema types, including Protobuf, Avro, JSON, XML, Thrift, MessagePack, FlatBuffers, YAML, CBOR, and more. You can extend the support to additional schema types by overriding the extension mapping in the `AbstractParser` class and adding the corresponding values to the SchemaType enum.
 
 ### Extract Dependencies
 
