@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { DependenciesMap, DependenciesPartionnedMap, FilesDependencies, NamespaceMap } from './types';
+import { DependenciesMap, DependenciesNameMap, DependenciesPartionnedMap, FilesDependencies } from './types';
 import { VersionData } from '../versions-extractor/types';
 import SchemaType from '../types';
 
@@ -30,16 +30,18 @@ export default abstract class AbstractParser {
    */
   protected abstract extractDependencies(filePath: string): string[];
   /**
-   * Extracts a unique namespace or identifier from a given file.
+   * Extracts a unique name to be used as a reference in the schema registry.
    *
-   * Extract a namespace or other relevant identifier
-   * from the file. The namespace could be a package name, a root element tag, or some other identifier that
-   * gives context to the file's contents.
+   * This function derives a unique identifier for the file's schema, used as the reference name in the schema registry.
+   * For instance, in Protobuf, the name corresponds to the string specified in the `import` statement, while in Avro, it is the fully
+   * qualified name, including the namespace. Each name must be unique for the schema registry to manage file versions accurately (see
+   * README for details on versioning and implicit resolution). Note that each Protobuf `import` statement should reference only the
+   * file name, not the full file path.
    *
-   * @param {string} filePath - The path to the file from which to extract the namespace or identifier.
-   * @returns {string} - The fully qualified namespace or identifier.
+   * @param {string} filePath - The file path from which to derive the unique name or namespace identifier.
+   * @returns {string} - A fully qualified, unique namespace or identifier for the schema.
    */
-  protected abstract extractNamespace(filePath: string): string;
+  protected abstract extractName(filePath: string): string;
   /**
    * Recursively collects files from a given directory that match the specified extensions.
    *
@@ -134,12 +136,12 @@ export default abstract class AbstractParser {
     const fileSet = new Set(files.map((file) => path.relative(baseDirectory, file)));
     const dependenciesMap: DependenciesMap = new Map<string, string[]>();
     const dependenciesPartionnedMap: DependenciesPartionnedMap = new Map<string, Map<string, string[]>>();
-    const namespaceMap: NamespaceMap = new Map<string, string>();
+    const dependenciesNameMap: DependenciesNameMap = new Map<string, string>();
 
     files.forEach((file) => {
       const relativePath = path.relative(baseDirectory, file);
       const dependencies = this.extractDependencies(file);
-      namespaceMap.set(relativePath, this.extractNamespace(file));
+      dependenciesNameMap.set(relativePath, this.extractName(file));
       const fileVersions = versionData.fileMap.get(relativePath) ?? [];
       const fullDependencies = new Set<string>();
       const partionnedDependencies = new Map<string, string[]>();
@@ -175,6 +177,6 @@ export default abstract class AbstractParser {
       dependenciesPartionnedMap.set(relativePath, partionnedDependencies);
       dependenciesMap.set(relativePath, Array.from(fullDependencies));
     });
-    return { dependenciesMap, namespaceMap, dependenciesPartionnedMap };
+    return { dependenciesMap, dependenciesNameMap, dependenciesPartionnedMap };
   }
 }

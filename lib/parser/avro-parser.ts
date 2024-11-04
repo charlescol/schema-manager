@@ -38,7 +38,7 @@ export default class AvroParser extends AbstractParser {
     return Array.from(dependencies);
   }
 
-  protected extractNamespace(filePath: string): string {
+  protected extractName(filePath: string): string {
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const schema = JSON.parse(fileContent);
     if (!schema.namespace) {

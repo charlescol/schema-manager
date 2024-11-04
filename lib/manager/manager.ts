@@ -1,10 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import AbstractParser from '../parser/abstract-parser';
-import AbstractRegistry from '../registry/abstract-registry';
 import topologicalSort from '../utils/topological-sort';
 import VersionsExtractor from '../versions-extractor/version-extractor';
-import { DependencyResolutionMode } from '../versions-extractor/types';
 import { ManagerConfig } from './types';
 
 export default class Manager {
@@ -45,7 +42,7 @@ export default class Manager {
       for (const fullVersion of partionnedDependencies.keys()) {
         const references = this.config.schemaRegistry.buildReferences(
           partionnedDependencies.get(fullVersion)!,
-          dependenciesResult.namespaceMap,
+          dependenciesResult.dependenciesNameMap,
           subjects,
         );
         const formattedSubject = subjectBuilder(fullVersion, filepath);

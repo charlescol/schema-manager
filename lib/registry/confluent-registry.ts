@@ -3,7 +3,7 @@ import * as qs from 'qs';
 import SchemaType from '../types';
 import AbstractRegistry from './abstract-registry';
 import { ConfluentRegistryReference } from './types';
-import { DependenciesMap, NamespaceMap } from '../parser/types';
+import { DependenciesNameMap } from '../parser/types';
 
 export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistryReference> {
   async registerSchema(
@@ -40,12 +40,12 @@ export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistr
 
   public buildReferences(
     dependencies: string[],
-    namespaceMap: NamespaceMap,
+    dependenciesNameMap: DependenciesNameMap,
     subjects: Map<string, string>,
   ): ConfluentRegistryReference[] {
     const references = [];
     for (const dependency of dependencies) {
-      const name = namespaceMap.get(dependency);
+      const name = dependenciesNameMap.get(dependency);
       if (!name) throw new Error(`Subject ${dependency} is not registered`);
       references.push({
         name,

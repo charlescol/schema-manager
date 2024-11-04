@@ -1,5 +1,6 @@
-import { DependenciesMap, NamespaceMap } from '../parser/types';
+import { DependenciesNameMap } from '../parser/types';
 import SchemaType from '../types';
+
 import { RegistryConfig } from './types';
 
 export default abstract class AbstractRegistry<TRef> {
@@ -39,7 +40,7 @@ export default abstract class AbstractRegistry<TRef> {
    */
   public abstract buildReferences(
     dependencies: string[],
-    namespaceMap: NamespaceMap,
+    dependenciesNameMap: DependenciesNameMap,
     subjects: Map<string, string>,
   ): TRef[];
 }

@@ -8,7 +8,7 @@ This guide will walk you through the process of creating a parser for schema fil
 - **Extract Namespace or Identifier:** Extract a unique identifier or namespace that gives context to the file’s contents.
 - **Map File Dependencies and Namespaces:** Generate two mappings:
   • **Dependencies Map:** A mapping of each file to its list of resolved dependencies.
-  • **Namespace Map:** A mapping of each file to its fully qualified namespace or identifier.
+  • **Dependencies Name Map:** A mapping of each file to its fully qualified name, used as the reference name in the schema registry.
 
 ## Step-by-Step Guide to Creating a Parser
 
@@ -54,35 +54,31 @@ protected extractDependencies(filePath: string): string[] {
 }
 ```
 
-### Extract Namespace
+### Extract Name
 
-This method extracts a unique identifier or namespace from the file. For Protobuf files, this could be a combination of the package name and message name:
+This function derives a unique identifier for the file's schema, used as the reference name in the schema registry. For instance, in Protobuf, the name corresponds to the string specified in the `import` statement, while in Avro, it is the fully qualified name, including the namespace. Each name must be unique for the schema registry to manage file versions accurately.
 
 ```typescript
-protected extractNamespace(filePath: string): string {
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
-  const packageRegex = /package\s+([\w.]+)\s*;/;
-  const messageRegex = /message\s+(\w+)\s*{/;
-  const packageMatch = fileContent.match(packageRegex);
-  if (!packageMatch || packageMatch.length < 2) {
-    throw new Error('Package declaration not found in the file');
+  protected extractName(filePath: string): string {
+    return path.basename(filePath);
   }
-  const packageName = packageMatch[1];
-  const messageMatch = fileContent.match(messageRegex);
-  if (!messageMatch || messageMatch.length < 2) {
-    throw new Error('Message declaration not found in the file');
-  }
-  const messageName = messageMatch[1];
-  return `${packageName}.${messageName}`;
-}
 ```
+
+**In Protobuf files, the import statement should reference only the file name and not the full file path.** This is because dependency resolution is managed within the versions.json file, which allows the schema manager to dynamically assign the correct versioned dependencies for each import.
+
+The schema manager supports an implicit import mechanism, enabling the same file to be imported in multiple versions without conflict. This flexibility allows each version of a schema to maintain its own set of dependencies, even if those dependencies differ across versions.
+
+For instance, if a file is used in multiple schema versions with different dependencies in each, the import must not rely on a static dependency path. Instead, each version will resolve dependencies according to its specific versions.json configuration.
 
 ### Using the Parser
 
 You can now use the parser in your application as shown below:
 
 ```typescript
-await new Manager(registry, new ProtobufParser()).loadAll(...);
+await new Manager({
+        schemaRegistry: registry,
+        parser: new ProtobufParser(),
+      }).loadAll(...);
 ```
 
 ### Handling Multiple Schema Types

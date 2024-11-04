@@ -75,7 +75,7 @@ Below the parameters that can be passed to the `AbstractRegistry` constructor.
 
 1. **Organize Your Schemas:**
 
-   - Place your files in versioned directories (e.g., v1, v2) and map them in `versions.json`.
+   - Place your files in versioned directories (e.g., v1, v2) and map them in `versions.json`. Please consider the [formatting considerations](#formatting-considerations-for-schemas) when importing files for Protobuf schemas.
 
 2. **Run Schema Manager:**
 
@@ -225,6 +225,14 @@ If the file above is saved as `publish-schemas.ts`, you can run it with the foll
 ```bash
 tsc && node dist/publish-schemas.js
 ```
+
+## Formatting considerations for schemas
+
+**In Protobuf files, the import statement should reference only the file name and not the full file path.** This is because dependency resolution is managed within the versions.json file, which allows the schema manager to dynamically assign the correct versioned dependencies for each import.
+
+The schema manager supports an implicit import mechanism, enabling the same file to be imported in multiple versions without conflict. This flexibility allows each version of a schema to maintain its own set of dependencies, even if those dependencies differ across versions.
+
+For instance, if a file is used in multiple schema versions with different dependencies in each, the import must not rely on a static dependency path. Instead, each version will resolve dependencies according to its specific versions.json configuration.
 
 ## Future Plans and Roadmap
 
