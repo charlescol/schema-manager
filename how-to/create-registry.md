@@ -69,7 +69,7 @@ schemaType: SchemaType,
 
 ### Implement the buildReferences Method
 
-The buildReferences method creates an array of references for the schema based on its dependencies. It looks up the dependencies and retrieves their namespaces from namespaceMap, then maps them to their corresponding subjects.
+The buildReferences method creates an array of references for the schema based on its dependencies. It looks up the dependencies and retrieves their namespaces from dependenciesNameMap, then maps them to their corresponding subjects. A full example of the name mapping for Protobuf files with is shown in the [Overview](overview.md#parser-output) section.
 
 ```typescript
   public buildReferences(
