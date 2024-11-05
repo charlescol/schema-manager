@@ -111,5 +111,8 @@ const registry = new ConfluentRegistry({
     Accept: 'application/vnd.schemaregistry.v1+json',
   },
 });
-await new Manager(registry, new MyParser()).loadAll(...);
+await new Manager({
+  schemaRegistry: registry,
+  parser: new ProtobufParser(),
+}).loadAll(...);
 ```

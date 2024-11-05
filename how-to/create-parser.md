@@ -74,9 +74,9 @@ You can now use the parser in your application as shown below:
 
 ```typescript
 await new Manager({
-        schemaRegistry: registry,
-        parser: new ProtobufParser(),
-      }).loadAll(...);
+  schemaRegistry: registry,
+  parser: new ProtobufParser(),
+}).loadAll(...);
 ```
 
 ### Full class
