@@ -21,7 +21,13 @@ An example of integration for Schema Manager in managing all the schemas in a Ka
 
 ### Quick Start
 
-You can install Schema Manager using NPM:
+For an example repository using the Schema Manager:
+
+```bash
+git clone https://github.com/charlescol/schema-manager-example.git
+```
+
+The Schema Manager is distributed via NPM:
 
 ```bash
 npm install @charlescol/schema-manager
