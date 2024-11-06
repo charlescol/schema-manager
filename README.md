@@ -1,5 +1,10 @@
 # Schema Manager
 
+![npm version](https://img.shields.io/npm/v/@charlescol/schema-manager)
+![Build Status](https://github.com/<ton_nom_d_utilisateur>/<nom_du_dépôt>/actions/workflows/<fichier_de_workflow>.yml/badge.svg)
+![npm downloads](https://img.shields.io/npm/dm/@charlescol/schema-manager)
+![License](https://img.shields.io/github/license/<ton_nom_d_utilisateur>/<nom_du_dépôt>)
+
 ## Automating Schema Versioning and Dependency Management
 
 ### Introduction
