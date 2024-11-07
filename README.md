@@ -21,7 +21,7 @@ An example of integration for Schema Manager in managing all the schemas in a Ka
 
 ### Quick Start
 
-For an example repository using the Schema Manager:
+For an [example repository](https://github.com/charlescol/schema-manager-example) using the Schema Manager:
 
 ```bash
 git clone https://github.com/charlescol/schema-manager-example.git
