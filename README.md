@@ -117,7 +117,7 @@ example-schemas/
   ├── topic2/
   │   ├── v1/
   │   │   └── data2.proto        # Schema for v1 data2 of topic2 (depends on ./common/v1/entity.proto)
-  │   └── versions.json          # Version mapping for topic1 (v1 and v2)
+  │   └── versions.json          # Version mapping for topic2 (v1)
   ├── common/
   │   ├── v1/
   │   │   └── entity.proto       # Schema for test entity
