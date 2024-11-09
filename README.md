@@ -7,6 +7,17 @@
 
 ## Automating Schema Versioning and Dependency Management
 
+### Why Schema Manager?
+
+- **Centralized Schema Management**: Unify all your schema files (Avro, Protobuf, JSON) in one place.
+- **Automated Registration and Versioning**: Automatically handles dependencies and publishes schemas in the correct order.
+- **Flexible and Configurable**: Works with Confluent Schema Registry and is extendable to other registries.
+- **Quick Start Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)
+
+**Give it a try to see how Schema Manager simplifies schema management for distributed services!**
+
+---
+
 ### Introduction
 
 In modern microservices architectures, separating concerns is critical for scalability and maintainability. Managing schema files (e.g., Avro, Protobuf, JSON) across services can become complex and error-prone, especially when each microservice is responsible for publishing schemas to a schema registry (e.g., Confluent Schema Registry).
