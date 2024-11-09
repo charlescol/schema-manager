@@ -150,6 +150,7 @@ In our case adding a versions.json in the common directory is not necessary beca
 ```json
 {
   "v1": {
+    "data2": "v1/data2.proto",
     "entity": "../common/v1/entity.proto"
   }
 }
