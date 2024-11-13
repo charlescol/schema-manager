@@ -5,6 +5,7 @@ import Manager from '../dist/manager/manager';
 import ProtobufParser from '../dist/parser/protobuf-parser';
 import AvroParser from '../dist/parser/avro-parser';
 import SchemaType from '../dist/types';
+import { ConfigType } from '../dist/config/config.types';
 
 /*
  * This file is used for running examples in a development environment only;
@@ -46,28 +47,33 @@ import SchemaType from '../dist/types';
     },
   });
 
+  let manager: Manager;
+
   switch (preset.toUpperCase()) {
     case SchemaType.AVRO:
-      await new Manager({
+      manager = new Manager({
         schemaRegistry: registry,
-        parser: new AvroParser(),
-      }).loadAll(`${SCHEMA_DIR}/avro`, subjectBuilder);
+        configType: ConfigType.AVRO,
+      });
+      await manager.build(`${SCHEMA_DIR}/avro`);
 
       break;
     default:
-      await new Manager({
+    case SchemaType.AVRO:
+      manager = new Manager({
         schemaRegistry: registry,
-        parser: new ProtobufParser(),
-      }).loadAll(`${SCHEMA_DIR}/protobuf`, subjectBuilder);
-      break;
+        configType: ConfigType.PROTOBUF,
+      });
+      await manager.build(`${SCHEMA_DIR}/protobuf`);
   }
+  //await manager.register(subjectBuilder);
 })();
 
-function subjectBuilder(fullVersionPath: string, filepath: string): string {
+function subjectBuilder(filepath: string): string {
   // Extract topic and version
-  const [topic, version] = fullVersionPath.split('/');
+  const [topic, version, filename] = filepath.split('/');
   // Extract the filename without extension
-  const filename = filepath.split('/').pop()?.split('.')[0] || '';
+  const filenameWithoutExt = filename?.split('.')[0] || '';
   // Return the constructed subject
-  return `${topic}.${filename}.${version}`;
+  return `${topic}.${filenameWithoutExt}.${version}`;
 }

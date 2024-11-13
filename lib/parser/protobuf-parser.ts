@@ -12,8 +12,7 @@ export default class ProtobufParser extends AbstractParser {
       .map((line) => line.match(/"([^"]+)"/)?.[1])
       .filter((name): name is string => Boolean(name))
       .map((name) => {
-        const fileNameWithExtension = path.basename(name); // Extract the filename including extension
-        return fileNameWithExtension.replace(/\.\w+$/, ''); // Remove the extension
+        return path.basename(name); // Extract the filename including extension
       });
     return dependencies;
   }
