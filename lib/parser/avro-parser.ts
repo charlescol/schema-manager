@@ -31,7 +31,7 @@ export default class AvroParser extends AbstractParser {
     for (const match of matches) {
       const typeFound = match[2];
       if (!AvroParser.primitiveTypes.includes(typeFound)) {
-        dependencies.add(typeFound.split('.').pop() as string);
+        dependencies.add(`${typeFound.split('.').pop() as string}.avsc`);
       }
     }
     return Array.from(dependencies);

@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { DependencyResolutionMode, FileMap, VersionData, VersionMap } from './types';
+import { DependencyResolutionMode, VersionData, VersionMap } from './types';
 
 export default class VersionsExtractor {
   constructor(dependencyResolutionMode: DependencyResolutionMode = DependencyResolutionMode.IMPLICIT) {
@@ -65,12 +65,12 @@ export default class VersionsExtractor {
    */
   public async extract(baseDirectory: string): Promise<VersionData> {
     this.baseDirectory = baseDirectory;
-    const fileMap: FileMap = new Map();
+
     const versionMap: VersionMap = new Map();
 
-    await this.processDirectory(baseDirectory, versionMap, fileMap);
+    await this.processDirectory(baseDirectory, versionMap);
 
-    return { fileMap, versionMap };
+    return { versionMap };
   }
 
   /**
@@ -82,14 +82,14 @@ export default class VersionsExtractor {
    * @param {FileMap} fileMap - A map that tracks `.proto` files and the versions they are associated with.
    * @returns {Promise<void>}
    */
-  private async processDirectory(currentPath: string, versionMap: VersionMap, fileMap: FileMap): Promise<void> {
+  private async processDirectory(currentPath: string, versionMap: VersionMap): Promise<void> {
     const entries = await fs.promises.readdir(currentPath, { withFileTypes: true });
     for (const entry of entries) {
       const absolutePath = path.join(currentPath, entry.name);
       if (entry.isDirectory()) {
-        await this.processDirectory(absolutePath, versionMap, fileMap);
+        await this.processDirectory(absolutePath, versionMap);
       } else if (entry.isFile() && entry.name === 'versions.json') {
-        await this.processFile(absolutePath, versionMap, fileMap);
+        await this.processFile(absolutePath, versionMap);
       }
     }
   }
@@ -103,7 +103,7 @@ export default class VersionsExtractor {
    * @param {FileMap} fileMap - A map that tracks `.proto` files and the versions they are associated with.
    * @returns {Promise<void>}
    */
-  private async processFile(filePath: string, versionMap: VersionMap, fileMap: FileMap): Promise<void> {
+  private async processFile(filePath: string, versionMap: VersionMap): Promise<void> {
     const data: VersionData = JSON.parse(await fs.promises.readFile(filePath, 'utf8'));
     const directoryPath = path.dirname(filePath);
     const relativeDirectoryPath = path.relative(this.baseDirectory, directoryPath);
@@ -113,12 +113,6 @@ export default class VersionsExtractor {
       for (const [file, relativePath] of Object.entries(files)) {
         const fullPath = path.join(directoryPath, relativePath);
         const relativeFullPath = path.relative(this.baseDirectory, fullPath);
-        if (!fileMap.has(relativeFullPath)) {
-          fileMap.set(relativeFullPath, []);
-        } else if (this.dependencyResolutionMode === DependencyResolutionMode.EXPLICIT) {
-          throw new Error(`Implicit dependency resolution is not supported for ${relativeFullPath}`);
-        }
-        fileMap.get(relativeFullPath)!.push({ version, full: fullVersionPath });
         versionMap.get(fullVersionPath)!.set(file.toLowerCase(), relativeFullPath);
       }
     }

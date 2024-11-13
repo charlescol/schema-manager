@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { DependenciesMap, DependenciesNameMap, DependenciesPartionnedMap, FilesDependencies } from './types';
+import { DependenciesMap, DependenciesNameMap, FilesDependencies } from './types';
 import { VersionData } from '../versions-extractor/types';
 import SchemaType from '../types';
 
@@ -113,20 +113,6 @@ export default abstract class AbstractParser {
    *    'some-path/C/dependency.proto'  => 'someNamespace.models.Dependency'
    *    ```
    *
-   * 3. **dependenciesPartionnedMap**: A map that associates each file with a map of versions to their specific dependencies.
-   *    This allows identification of dependencies for each version of the file.
-   *
-   *    Example:
-   *    ```
-   *    dependenciesPartionnedMap: Map(6) {
-   *      'common/v1/entity.proto' => Map(2) { 'common/v1' => [], 'topic1/v2' => [] },
-   *      'topic1/v1/data.proto' => Map(1) { 'topic1/v1' => [] },
-   *      'topic1/v1/model.proto' => Map(2) { 'topic1/v1' => [Array], 'topic1/v2' => [Array] },
-   *      'topic1/v2/data.proto' => Map(1) { 'topic1/v2' => [Array] },
-   *      'topic2/v1/data2.proto' => Map(2) { 'topic2/v1' => [], 'topic2/test2' => [] },
-   *      'topic2/v2/data.proto' => Map(1) { 'topic2/test2' => [Array] }
-   *    }
-   *    ```
    *
    * @param {VersionData} versionData - Contains information about file versions and their mappings.
    * @param {string} baseDirectory - The base directory where files are located.
@@ -136,52 +122,22 @@ export default abstract class AbstractParser {
    *  - `dependenciesPartionnedMap`: Maps each file to a map of versions and their specific dependencies.
    * @throws {Error} - If dependencies cannot be resolved or files are missing.
    */
-  public parse(versionData: VersionData, baseDirectory: string): FilesDependencies {
+  public parse(baseDirectory: string): FilesDependencies {
     const files = this.getFiles(baseDirectory);
     const fileSet = new Set(files.map((file) => path.relative(baseDirectory, file)));
     const dependenciesMap: DependenciesMap = new Map<string, string[]>();
-    const dependenciesPartionnedMap: DependenciesPartionnedMap = new Map<string, Map<string, string[]>>();
     const dependenciesNameMap: DependenciesNameMap = new Map<string, string>();
-
     files.forEach((file) => {
       const relativePath = path.relative(baseDirectory, file);
-      const dependencies = this.extractDependencies(file);
+      let dependencies = this.extractDependencies(file);
+      dependencies = dependencies.map((dep) => {
+        const directoryPath = path.dirname(relativePath);
+        return path.join(directoryPath, dep);
+      });
       dependenciesNameMap.set(relativePath, this.extractName(file));
-      const fileVersions = versionData.fileMap.get(relativePath) ?? [];
-      const fullDependencies = new Set<string>();
-      const partionnedDependencies = new Map<string, string[]>();
-
-      if (!dependencies.length) {
-        fileVersions.forEach((versionInfo) => {
-          partionnedDependencies.set(versionInfo.full, []);
-        });
-      } else {
-        dependencies.forEach((dep) => {
-          fileVersions.forEach((versionInfo) => {
-            if (!partionnedDependencies.has(versionInfo.full)) {
-              partionnedDependencies.set(versionInfo.full, []);
-            }
-            const versionMappings = versionData.versionMap.get(versionInfo.full);
-            if (versionMappings) {
-              const resolvedPath = versionMappings.get(dep.toLowerCase());
-              if (resolvedPath) {
-                if (fileSet.has(resolvedPath)) {
-                  partionnedDependencies.get(versionInfo.full)!.push(resolvedPath);
-                  fullDependencies.add(resolvedPath);
-                } else {
-                  throw new Error(`Dependency ${resolvedPath} is not a valid file in version ${versionInfo.full}`);
-                }
-              } else {
-                throw new Error(`Dependency ${dep} not found in version ${versionInfo.version}`);
-              }
-            }
-          });
-        });
-      }
-
-      dependenciesPartionnedMap.set(relativePath, partionnedDependencies);
-      dependenciesMap.set(relativePath, Array.from(fullDependencies));
+      dependenciesMap.set(relativePath, dependencies);
     });
-    return { dependenciesMap, dependenciesNameMap, dependenciesPartionnedMap };
+
+    return { dependenciesMap, dependenciesNameMap };
   }
 }
