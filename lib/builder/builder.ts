@@ -6,7 +6,7 @@ import AbtractTransformer from '../transformer/abstract-transformer';
 
 export default class Builder {
   constructor(protected readonly transformer: AbtractTransformer) {}
-  async build(schemasPath: string, versionMap: VersionMap, buildDir = './build'): Promise<void> {
+  async build(schemasPath: string, versionMap: VersionMap, buildDir = DEFAULT_BUILD_DIR): Promise<void> {
     // Remove the build directory if it already exists
     if (await fs.stat(buildDir).catch(() => false)) {
       await fs.rm(buildDir, { recursive: true, force: true });

@@ -1,5 +1,5 @@
 {
-  "namespace": "topic1",
+  "namespace": "topic1.v2",
   "type": "record",
   "name": "Model",
   "fields": [
@@ -22,7 +22,7 @@
       "name": "entities",
       "type": {
         "type": "array",
-        "items": "common.Entity"
+        "items": "common.v1.Entity"
       }
     }
   ]

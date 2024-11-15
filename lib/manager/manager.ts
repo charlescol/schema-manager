@@ -7,7 +7,8 @@ import Builder from '../builder/builder';
 import projectConfig from '../config/config';
 import AbtractTransformer from '../transformer/abstract-transformer';
 import AbstractParser from '../parser/abstract-parser';
-import { VersionData } from '../versions-extractor/types';
+import { DependencyResolutionMode } from '../versions-extractor/types';
+import { UnsupportedConfigTypeError } from '../common/errors';
 
 export default class Manager {
   protected readonly versionDataExtractor: VersionsExtractor;
@@ -15,31 +16,26 @@ export default class Manager {
   protected readonly parser: AbstractParser;
 
   constructor(protected readonly config: ManagerConfig) {
-    this.versionDataExtractor = new VersionsExtractor(config.dependencyResolutionMode);
     if (!projectConfig.schemaTypeConfig[config.configType]) {
-      throw new Error(`Unsupported config type: ${config.configType}`);
+      throw new UnsupportedConfigTypeError(config.configType);
     }
+    if (projectConfig.schemaTypeConfig[config.configType].forceExplicitResolution) {
+      config.dependencyResolutionMode = DependencyResolutionMode.EXPLICIT;
+    }
+    this.versionDataExtractor = new VersionsExtractor(config.dependencyResolutionMode);
     this.transformer = projectConfig.schemaTypeConfig[config.configType].transformer;
     this.parser = projectConfig.schemaTypeConfig[config.configType].parser;
   }
 
-  public async build(baseDirectory: string, buildDir: string = './build'): Promise<void> {
-    const startTime = Date.now();
-
+  public async build(baseDirectory: string, buildDir = DEFAULT_BUILD_DIR): Promise<void> {
     const versionsResolution = await this.versionDataExtractor.extract(baseDirectory);
     new Builder(this.transformer).build(baseDirectory, versionsResolution.versionMap, buildDir);
-
-    const endTime = Date.now();
-    const durationMs = endTime - startTime;
-
-    const seconds = Math.floor(durationMs / 1000);
-    const milliseconds = durationMs % 1000;
-    console.log(`Build completed in ${seconds}.${milliseconds.toString().padStart(3, '0')} s`);
+    console.log(`Schema build completed successfully`);
   }
 
   public async register(
     subjectBuilder: (fullVersionPath: string) => string,
-    buildDir: string = './build',
+    buildDir = DEFAULT_BUILD_DIR,
   ): Promise<void> {
     const dependenciesResult = this.parser.parse(buildDir);
     const order = topologicalSort(dependenciesResult.dependenciesMap);
