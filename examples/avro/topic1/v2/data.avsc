@@ -1,5 +1,5 @@
 {
-  "namespace": "topic1.v1",
+  "namespace": "topic1.v2",
   "type": "record",
   "name": "Data",
   "fields": [

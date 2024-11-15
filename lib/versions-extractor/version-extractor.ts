@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { DependencyResolutionMode, VersionData, VersionMap } from './types';
+import { ExplicitResolutionError } from '../common/errors';
 
 export default class VersionsExtractor {
   constructor(dependencyResolutionMode: DependencyResolutionMode = DependencyResolutionMode.IMPLICIT) {
@@ -15,72 +16,39 @@ export default class VersionsExtractor {
    */
   private baseDirectory: string;
   /**
-   * Extracts version data from the provided base directory.
+   * Extracts version data from the specified base directory.
    *
-   * This function recursively scans the given base directory to find all `versions.json`
-   * files, which contain version mappings for schema files. It reads and processes each
-   * `versions.json` file to create two mappings:
+   * This function traverses the provided base directory to locate `versions.json` files
+   * and processes their contents to generate a mapping of version directories and schema files.
+   * It creates a `versionMap` associating each version directory with a map of schema file names
+   * to their corresponding file paths.
    *
-   * 1. **versionMap**: A map that associates each version directory with a mapping of schema files
-   *    to their resolved file paths. This helps in determining which file corresponds to a version
-   *    and where it is located.
-   *
-   *
-   *    Example:
-   *    ```
-   *    Map(3) {
-   *      'some-path/test/a' => Map(2) {
-   *        'file' => 'some-path/test/A/file.proto',
-   *        'dependency' => 'some-path/test/B/dependency.proto'
-   *      },
-   *      'some-path/test/b' => Map(2) {
-   *        'file' => 'some-path/test/A/file.proto',
-   *        'dependency' => 'some-path/test/C/dependency.proto'
-   *      }
-   *    }
-   *    ```
-   *
-   * 2. **fileMap**: A map that associates each schema file with an array of version objects.
-   *    Each version object includes the version identifier and the full version path.
-   *
-   *    Example:
-   *    ```
-   *    Map(3) {
-   *      'some-path/test/A/file.proto' => [
-   *        { version: 'a', full: 'some-path/test/a' },
-   *        { version: 'b', full: 'some-path/test/b' }
-   *      ],
-   *      'some-path/test/B/dependency.proto' => [
-   *        { version: 'a', full: 'some-path/test/a' }
-   *      ]
-   *    }
-   *    ```
-   *
-   * @export
    * @param {string} baseDirectory - The base directory where `versions.json` files are located.
-   * @returns {Promise<VersionData>} - An object containing two maps:
-   *  - `fileMap`: Maps `.proto` files to arrays of version objects.
-   *  - `versionMap`: Maps version directories to `.proto` file mappings.
-   * @throws {Error} - If there is an issue reading or processing files.
+   * @returns {Promise<VersionData>} - An object containing:
+   *   - `versionMap`: Maps version directories to schema file mappings.
+   * @throws {ExplicitResolutionError} - If duplicates are found in `EXPLICIT` dependency resolution mode.
+   * @throws {Error} - For issues related to reading or processing files.
    */
   public async extract(baseDirectory: string): Promise<VersionData> {
     this.baseDirectory = baseDirectory;
-
     const versionMap: VersionMap = new Map();
-
     await this.processDirectory(baseDirectory, versionMap);
-
+    if (this.dependencyResolutionMode === DependencyResolutionMode.EXPLICIT) {
+      const duplicateValues = this.findDuplicateValues(versionMap);
+      if (duplicateValues.length > 0) {
+        throw new ExplicitResolutionError(duplicateValues);
+      }
+    }
     return { versionMap };
   }
-
   /**
-   * Recursively scans the directory for `versions.json` files.
+   * Recursively scans a directory for `versions.json` files and processes them.
    *
    * @private
-   * @param {string} currentPath - The current directory being processed.
-   * @param {VersionMap} versionMap - A map that tracks version directories and their corresponding `.proto` files.
-   * @param {FileMap} fileMap - A map that tracks `.proto` files and the versions they are associated with.
-   * @returns {Promise<void>}
+   * @param {string} currentPath - The current directory being scanned.
+   * @param {VersionMap} versionMap - A map that associates version directories with schema files and their paths.
+   * @returns {Promise<void>} - Resolves when the directory and its subdirectories have been processed.
+   * @throws {ExplicitResolutionError} - If the explicit resolution mode detects unresolved conflicts.
    */
   private async processDirectory(currentPath: string, versionMap: VersionMap): Promise<void> {
     const entries = await fs.promises.readdir(currentPath, { withFileTypes: true });
@@ -93,15 +61,13 @@ export default class VersionsExtractor {
       }
     }
   }
-
   /**
-   * Reads and processes a `versions.json` file, updating the `versionMap` and `fileMap` accordingly.
+   * Processes a `versions.json` file, extracting version information and populating the `versionMap`.
    *
    * @private
-   * @param {string} filePath - Full path to the `versions.json` file.
-   * @param {VersionMap} versionMap - A map that tracks version directories and their corresponding `.proto` files.
-   * @param {FileMap} fileMap - A map that tracks `.proto` files and the versions they are associated with.
-   * @returns {Promise<void>}
+   * @param {string} filePath - The full path to the `versions.json` file being processed.
+   * @param {VersionMap} versionMap - A map that tracks version directories and their associated schema files.
+   * @returns {Promise<void>} - Resolves after the file has been processed and the `versionMap` is updated.
    */
   private async processFile(filePath: string, versionMap: VersionMap): Promise<void> {
     const data: VersionData = JSON.parse(await fs.promises.readFile(filePath, 'utf8'));
@@ -116,5 +82,26 @@ export default class VersionsExtractor {
         versionMap.get(fullVersionPath)!.set(file.toLowerCase(), relativeFullPath);
       }
     }
+  }
+  /**
+   * Identifies duplicate string values across all submaps in a VersionMap.
+   *
+   * @param {VersionMap} masterMap - A map where keys represent version directories, and values are submaps of schema file paths.
+   * @returns {string[]} - An array of duplicate values that appear in more than one submap.
+   */
+  private findDuplicateValues(masterMap: VersionMap): string[] {
+    const valueOccurrences = new Map<string, number>();
+    masterMap.forEach((subMap) => {
+      subMap.forEach((value) => {
+        valueOccurrences.set(value, (valueOccurrences.get(value) || 0) + 1);
+      });
+    });
+    const duplicateValues: string[] = [];
+    valueOccurrences.forEach((count, value) => {
+      if (count > 1) {
+        duplicateValues.push(value);
+      }
+    });
+    return duplicateValues;
   }
 }
