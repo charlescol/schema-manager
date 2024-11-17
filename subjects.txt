@@ -1,8 +1,0 @@
-topic1.data.v1
-topic1.entity.v2
-topic2.data2.test2
-topic2.data2.v1
-topic1.model.v1
-topic1.data.v2
-topic2.data.test2
-topic1.model.v2
