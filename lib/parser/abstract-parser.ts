@@ -124,7 +124,6 @@ export default abstract class AbstractParser {
    */
   public parse(baseDirectory: string): FilesDependencies {
     const files = this.getFiles(baseDirectory);
-    const fileSet = new Set(files.map((file) => path.relative(baseDirectory, file)));
     const dependenciesMap: DependenciesMap = new Map<string, string[]>();
     const dependenciesNameMap: DependenciesNameMap = new Map<string, string>();
     files.forEach((file) => {
@@ -132,7 +131,7 @@ export default abstract class AbstractParser {
       let dependencies = this.extractDependencies(file);
       dependencies = dependencies.map((dep) => {
         const directoryPath = path.dirname(relativePath);
-        return path.join(directoryPath, dep);
+        return path.join(directoryPath.toLowerCase(), dep.toLowerCase());
       });
       dependenciesNameMap.set(relativePath, this.extractName(file));
       dependenciesMap.set(relativePath, dependencies);

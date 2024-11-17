@@ -9,6 +9,7 @@ import AbtractTransformer from '../transformer/abstract-transformer';
 import AbstractParser from '../parser/abstract-parser';
 import { DependencyResolutionMode } from '../versions-extractor/types';
 import { UnsupportedConfigTypeError } from '../common/errors';
+import { DEFAULT_BUILD_DIR, DEFAULT_SUBJECTS_DIR } from '../common/const';
 
 export default class Manager {
   protected readonly versionDataExtractor: VersionsExtractor;
@@ -22,9 +23,11 @@ export default class Manager {
     if (projectConfig.schemaTypeConfig[config.configType].forceExplicitResolution) {
       config.dependencyResolutionMode = DependencyResolutionMode.EXPLICIT;
     }
+    this.transformer = new projectConfig.schemaTypeConfig[config.configType].transformer({
+      namespaceBuilder: config.namespaceBuilder,
+    });
     this.versionDataExtractor = new VersionsExtractor(config.dependencyResolutionMode);
-    this.transformer = projectConfig.schemaTypeConfig[config.configType].transformer;
-    this.parser = projectConfig.schemaTypeConfig[config.configType].parser;
+    this.parser = new projectConfig.schemaTypeConfig[config.configType].parser(config);
   }
 
   public async build(baseDirectory: string, buildDir = DEFAULT_BUILD_DIR): Promise<void> {
@@ -32,12 +35,13 @@ export default class Manager {
     new Builder(this.transformer).build(baseDirectory, versionsResolution.versionMap, buildDir);
     console.log(`Schema build completed successfully`);
   }
-
   public async register(
     subjectBuilder: (fullVersionPath: string) => string,
     buildDir = DEFAULT_BUILD_DIR,
+    subjectsDir = DEFAULT_SUBJECTS_DIR,
   ): Promise<void> {
     const dependenciesResult = this.parser.parse(buildDir);
+    console.log(dependenciesResult.dependenciesMap);
     const order = topologicalSort(dependenciesResult.dependenciesMap);
     const subjects = new Map<string, string>();
 
@@ -60,5 +64,9 @@ export default class Manager {
       );
       console.log(`Registered schema for ${formattedSubject}`);
     }
+
+    // Save the subjects to a file, one subject per line
+    const subjectsArray = Array.from(subjects.values());
+    fs.writeFileSync(subjectsDir, subjectsArray.join('\n'), 'utf-8');
   }
 }

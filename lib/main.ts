@@ -2,8 +2,6 @@ import * as path from 'path';
 import * as minimist from 'minimist';
 import ConfluentRegistry from '../dist/registry/confluent-registry';
 import Manager from '../dist/manager/manager';
-import ProtobufParser from '../dist/parser/protobuf-parser';
-import AvroParser from '../dist/parser/avro-parser';
 import SchemaType from '../dist/types';
 import { ConfigType } from '../dist/config/config.types';
 
@@ -59,14 +57,13 @@ import { ConfigType } from '../dist/config/config.types';
 
       break;
     default:
-    case SchemaType.AVRO:
       manager = new Manager({
         schemaRegistry: registry,
         configType: ConfigType.PROTOBUF,
       });
       await manager.build(`${SCHEMA_DIR}/protobuf`);
   }
-  //await manager.register(subjectBuilder);
+  await manager.register(subjectBuilder);
 })();
 
 function subjectBuilder(filepath: string): string {

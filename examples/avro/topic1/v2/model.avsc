@@ -5,7 +5,7 @@
   "fields": [
     {
       "name": "data",
-      "type": "Data"
+      "type": "common.v1.Data"
     },
     {
       "name": "description",
