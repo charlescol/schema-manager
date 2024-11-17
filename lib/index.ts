@@ -5,3 +5,4 @@ export * from './registry/types';
 export * from './manager/types';
 export * from './config/config.types';
 export * from './types';
+export * from './common/const';

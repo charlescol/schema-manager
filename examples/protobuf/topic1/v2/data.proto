@@ -5,5 +5,5 @@ import "entity.proto";
 
 message Data {
   string additional_info = 1;
-  common.Entity entity = 1;
+  Entity entity = 2;
 }

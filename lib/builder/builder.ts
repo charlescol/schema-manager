@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { VersionMap } from '../versions-extractor/types';
-import ProtobufTransformer from '../transformer/protobuf-transformer';
 import AbtractTransformer from '../transformer/abstract-transformer';
+import { DEFAULT_BUILD_DIR } from '../common/const';
 
 export default class Builder {
   constructor(protected readonly transformer: AbtractTransformer) {}

@@ -3,7 +3,7 @@
     "data": "v1/data.avsc"
   },
   "test2": {
-    "data": "v2/data.avsc",
+    "data": "v1/data.avsc",
     "model": "v2/model.avsc",
     "entity": "../common/v1/entity.avsc"
   }
