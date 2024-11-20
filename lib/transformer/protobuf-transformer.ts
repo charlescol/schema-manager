@@ -6,9 +6,7 @@ export default class ProtobufTransformer extends AbstractTransformer {
   private namespaceBuilder: (filepath: string) => string;
   constructor(config: ProtobufTransformerConfig) {
     super(config);
-    if (!config.namespaceBuilder) {
-      this.namespaceBuilder = (filepath: string) => filepath.replace(/\//g, '.');
-    }
+    this.namespaceBuilder = config.namespaceBuilder || ((filepath: string) => filepath.replace(/\//g, '.'));
   }
   async transform(content: string, filePath: string): Promise<string> {
     /* Update import statements to use paths relative to `filePath` */

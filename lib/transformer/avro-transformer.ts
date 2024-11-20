@@ -5,9 +5,7 @@ export default class AvroTransformer extends AbstractTransformer {
   private namespaceBuilder: (filepath: string) => string;
   constructor(config: AvroTransformerConfig) {
     super(config);
-    if (!config.namespaceBuilder) {
-      this.namespaceBuilder = (filepath: string) => filepath.replace(/\//g, '.');
-    }
+    this.namespaceBuilder = config.namespaceBuilder || ((filepath: string) => filepath.replace(/\//g, '.'));
   }
   async transform(content: string, filePath: string): Promise<string> {
     const schema = JSON.parse(content);
