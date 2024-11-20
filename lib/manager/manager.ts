@@ -41,7 +41,6 @@ export default class Manager {
     subjectsDir = DEFAULT_SUBJECTS_DIR,
   ): Promise<void> {
     const dependenciesResult = this.parser.parse(buildDir);
-    console.log(dependenciesResult.dependenciesMap);
     const order = topologicalSort(dependenciesResult.dependenciesMap);
     const subjects = new Map<string, string>();
 
