@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import { DependenciesMap, DependenciesNameMap, FilesDependencies } from './types';
 import { VersionData } from '../versions-extractor/types';
 import SchemaType from '../types';
+import { getFiles, listFilesInDirectory } from '../utils/files';
 
 export default abstract class AbstractParser {
   /**
@@ -24,11 +25,8 @@ export default abstract class AbstractParser {
     '.yml': SchemaType.YAML,
     '.cbor': SchemaType.CBOR,
   };
-  /**
-   * An array of schema types that are supported by the parser.
-   * This is used in the `getSchemaType` method to determine the appropriate schema for a given file.
-   */
-  protected abstract readonly schemaTypes: string[];
+
+  protected abstract readonly allowedExtensions: string[];
   /**
    * Extracts dependencies names from a given file.
    *
@@ -53,28 +51,7 @@ export default abstract class AbstractParser {
    * @returns {string} - A fully qualified, unique namespace or identifier for the schema.
    */
   protected abstract extractName(filePath: string): string;
-  /**
-   * Recursively collects files from a given directory that match the specified extensions.
-   *
-   * @param {string} dir - The directory to start searching for files.
-   * @param {string[]} files - An array to accumulate files (used for recursion).
-   * @returns {string[]} - A list of file paths matching the specified extensions.
-   */
-  protected getFiles(dir: string, files: string[] = []): string[] {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    entries.forEach((entry) => {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        this.getFiles(fullPath, files);
-      } else if (entry.isFile()) {
-        const schemaType = this.getSchemaType(fullPath);
-        if (schemaType !== SchemaType.UNKNOWN && this.schemaTypes.includes(schemaType)) {
-          files.push(fullPath);
-        }
-      }
-    });
-    return files;
-  }
+
   /**
    * This method returns the schema type for a given file path. If the schema type is not supported, it returns `SchemaType.UNKNOWN`.
    *
@@ -85,58 +62,33 @@ export default abstract class AbstractParser {
     const fileExtension = path.extname(filepath).toLowerCase();
     return AbstractParser.extensionToSchemaType[fileExtension] || SchemaType.UNKNOWN;
   }
-  /**
-   * Processes files to map dependencies and namespaces/identifiers.
-   *
-   * This function recursively collects all files with matching extensions from the given directory,
-   * reads each file to extract its dependencies and the namespace or identifier (such as a package,
-   * root element, or other relevant identifier), and then creates three mappings:
-   *
-   * 1. **dependenciesMap**: A map that associates each file with its resolved dependencies (other files it references).
-   *    The dependencies are resolved based on version mappings provided in the `versionData`. If a dependency cannot be
-   *    resolved or the file does not exist in the expected version, an error is thrown.
-   *
-   *    Example:
-   *    ```
-   *    "some-path/A/file.proto" => ["some-path/B/dependency.proto", "some-path/C/dependency.proto"]
-   *    "some-path/B/dependency.proto"  => []
-   *    "some-path/C/dependency.proto"  => []
-   *    ```
-   *
-   * 2. **namespaceMap**: A map that associates each file with its fully qualified namespace or identifier. This is useful for
-   *    determining the structure of files, such as packages, XML root tags, or other identifiers unique to the file type.
-   *
-   *    Example:
-   *    ```
-   *    'some-path/A/file.proto' => 'someNamespace.models.File',
-   *    'some-path/B/dependency.proto'  => 'someNamespace.models.Dependency',
-   *    'some-path/C/dependency.proto'  => 'someNamespace.models.Dependency'
-   *    ```
-   *
-   *
-   * @param {VersionData} versionData - Contains information about file versions and their mappings.
-   * @param {string} baseDirectory - The base directory where files are located.
-   * @returns {FilesDependencies} - An object containing three maps:
-   *  - `dependenciesMap`: Maps each file to its list of resolved dependencies.
-   *  - `namespaceMap`: Maps each file to its fully qualified namespace or identifier.
-   *  - `dependenciesPartionnedMap`: Maps each file to a map of versions and their specific dependencies.
-   * @throws {Error} - If dependencies cannot be resolved or files are missing.
-   */
-  public parse(baseDirectory: string): FilesDependencies {
-    const files = this.getFiles(baseDirectory);
+
+  public async parse(baseDirectory: string): Promise<FilesDependencies> {
+    const files = getFiles(baseDirectory, [], this.allowedExtensions);
     const dependenciesMap: DependenciesMap = new Map<string, string[]>();
     const dependenciesNameMap: DependenciesNameMap = new Map<string, string>();
-    files.forEach((file) => {
-      const relativePath = path.relative(baseDirectory, file);
-      let dependencies = this.extractDependencies(file);
-      dependencies = dependencies.map((dep) => {
-        const directoryPath = path.dirname(relativePath);
-        return path.join(directoryPath.toLowerCase(), dep.toLowerCase());
-      });
-      dependenciesNameMap.set(relativePath, this.extractName(file));
-      dependenciesMap.set(relativePath, dependencies);
-    });
+    const folderFiles = new Map<string, string[]>();
+    for (const file of files) {
+      try {
+        const relativePath = path.relative(baseDirectory, file);
+        if (!folderFiles.has(relativePath))
+          folderFiles.set(relativePath, await listFilesInDirectory(path.dirname(file)));
 
+        let dependencies = this.extractDependencies(file);
+        const currentFolderFiles = folderFiles.get(relativePath);
+        dependencies = dependencies
+          .filter((dep) => currentFolderFiles!.includes(dep))
+          .map((dep) => {
+            const directoryPath = path.dirname(relativePath);
+            return path.join(directoryPath.toLowerCase(), dep.toLowerCase());
+          });
+        dependenciesNameMap.set(relativePath, this.extractName(file));
+        dependenciesMap.set(relativePath, dependencies);
+      } catch (error) {
+        console.error(`Error parsing file: ${file}`);
+        throw error;
+      }
+    }
     return { dependenciesMap, dependenciesNameMap };
   }
 }
