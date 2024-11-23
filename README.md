@@ -34,6 +34,8 @@ npm install @charlescol/schema-manager
 
 The minimal requirement is to initiate an npm project within your repository and install the package. The schema manager capabilities can be used programmatically in a JavaScript script file (example [here](#full-code)).
 
+**Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)
+
 ---
 
 ## Supported Schema Formats
@@ -348,7 +350,7 @@ message Data {
 - The namespace doesn't have to be included in the schema, and will be included in the built schema anyway.
 - The internal object name don't need to include the namespace name (e.g. `common.v1.Entity` ❌ `Entity` ✅)
 
-```json
+```avsc
 {
   // Don't need to create a namespace (if you do it will be replaced anyway)
   "type": "record",
