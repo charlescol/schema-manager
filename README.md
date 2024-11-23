@@ -8,7 +8,7 @@
 - Resolve schema dependencies in JSON configurations to eliminate redundancy and improve maintainability.
 
 **Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)  
-**Guide**: [How to use Schema Manager](https://github.com/charlescol/schema-manager/blob/main/how-to/overview.md)
+**Guide**: [Scenario Example](#scenario-example)
 
 ---
 
@@ -76,6 +76,14 @@ Please refer to the [Registry Documentation](how-to/create-registry.md) for more
 ## Scenario Example
 
 Consider a system managing a set of Protobuf schemas for an event-driven architecture. Each schema has multiple versions and dependencies.
+
+If you don’t already have a project set up, you can create one with the following commands:
+
+```bash
+mkdir schema-manager-example
+cd schema-manager-example
+npm init -y && npm install @charlescol/schema-manager
+```
 
 In this example, we have two topics named "topic1" and "topic2," as well as a common folder used for shared schemas.
 
@@ -318,28 +326,28 @@ tsc && node dist/publish-schemas.js
 
 ## Schema Content
 
-Many information are resolved during the build using the versions.json file. This setup is in place to avoid code redundancy and allow for dynamic schema transformations
+Many details are dynamically resolved during the build process using the `versions.json` file. This setup avoids code redundancy and enables dynamic schema transformations.
 
 ### Protobuf
 
-- The package doesn't have to be included in the schema, and will be included in the built schema anyway.
-- The import statement should reference only the file name and not the full file path (`import "common/v1/entity.proto";` ❌ `import "entity.proto";` ✅)
-- External imports can be used as usual (e.g. `import "google/protobuf/timestamp.proto"`)
-- The internal object name don't need to include the package name (e.g. `common.v1.Entity` ❌ `Entity` ✅)
+- **Package Handling**: The package is automatically included during the build process and does not need to be specified in the schema.
+- **Imports**: Import statements should reference only the file name without the full path (e.g., `import "entity.proto";` ✅, not `import "common/v1/entity.proto";` ❌).
+- **External Imports**: External imports (e.g., `google/protobuf/timestamp.proto`) remain unchanged.
+- **Object Names**: Internal object references do not need to include the package name (e.g., `Entity` ✅, not `common.v1.Entity` ❌).
 
 ```protobuf
 // topic1/v1/data.proto
 syntax = "proto3";
 
-// Don't need to create a package.
+// No need to create a package.
 
-import "entity.proto"; // Only the file name is used without the full path
-import "google/protobuf/timestamp.proto"; // External import remains unchanged
+import "entity.proto"; // Use only the file name
+import "google/protobuf/timestamp.proto"; // External imports are unchanged
 
 message Data {
-  string additional_info = 1;
-  google.protobuf.Timestamp created_at = 2; // External import remains unchanged
-  repeated Entity entities = 3; // Internal object name doesn't need to include the package name
+string additional_info = 1;
+google.protobuf.Timestamp created_at = 2; // External imports are unchanged
+repeated Entity entities = 3; // Internal object names exclude the package name
 }
 ```
 
@@ -347,10 +355,10 @@ message Data {
 
 ### Avro
 
-- The namespace doesn't have to be included in the schema, and will be included in the built schema anyway.
-- The internal object name don't need to include the namespace name (e.g. `common.v1.Entity` ❌ `Entity` ✅)
+- **Namespace Handling**: Namespaces are automatically included during the build process and do not need to be specified in the schema.
+- **Object Names**: Internal object references do not need to include the namespace name (e.g., `Entity` ✅, not `common.v1.Entity` ❌).
 
-```avsc
+```json
 {
   "type": "record",
   "name": "Model",
@@ -370,46 +378,53 @@ message Data {
 }
 ```
 
-**In Protobuf files, the import statement should reference only the file name and not the full file path.** This is because dependency resolution is managed within the versions.json file, which allows the schema manager to dynamically assign the correct versioned dependencies for each import.
-
-The schema manager supports an implicit import mechanism, enabling the same file to be imported in multiple versions without conflict. This flexibility allows each version of a schema to maintain its own set of dependencies, even if those dependencies differ across versions.
-
-For instance, if a file is used in multiple schema versions with different dependencies in each, the import must not rely on a static dependency path. Instead, each version will resolve dependencies according to its specific versions.json configuration.
+---
 
 ## Future Plans and Roadmap
 
-We plan to extend Schema Manager to support:
+We aim to extend Schema Manager with the following features:
 
-- Support for **other schema registries** beyond Confluent Schema Registry.
-- Addition of bigger set of supported formats, alongside the existing parsers.
-- A command-line interface (CLI) to manage schemas and visualize dependencies more easily.
+- **Support for Additional Schema Registries**: Expanding beyond Confluent Schema Registry to support other platforms.
+- **Expanded Format Support**: Adding parsers for more schema types beyond Protobuf, Avro, and JSON.
+- **Complex Transformations**: Enabling advanced schema transformations, such as adding options in Protobuf files to control future code generation.
+
+---
 
 ## Example of Integration with Schema Manager
 
-A common use case for Schema Manager is managing all the schemas in a Kafka-oriented application involving multiple microservices.
+A typical use case for Schema Manager is managing schemas in a Kafka-oriented application with multiple microservices. By centralizing schemas in a single repository, you can automate schema management tasks through a CI/CD pipeline.
 
-By using a **centralized schema registry**, you eliminate the need for each microservice to manage schemas independently or duplicate schema code across the services. Instead, each microservice only retrieves the schemas it needs from the centralized registry.
+### Pipeline Tasks
 
-The centralized schema repository is stored in a dedicated repository, which includes an NPM integration to include the Schema Manager. A small script (like the one provided in the [Scenario Example](#usage-example) section) is used to automatically register and update the schemas. Whenever a change is detected in the `versions.json` file within the schema directory, this can trigger a new build and schema registration, typically through a CI/CD pipeline.
+1. **Build Schemas**: Generate schema files from source.
+2. **Register Schemas**: Deploy schemas to the schema registry.
+3. **Code Generation**: Generate code for schemas in target programming languages.
+4. **Package Distribution**: Distribute generated code as packages (e.g., Maven, NPM, PyPI).
 
-### Workflow Example:
+### Workflow Example
 
-1. **Centralized Schema Management**: The schema repository is versioned and stored in a central repository. Any changes to the schemas (tracked in `versions.json`) will trigger a new schema build and registration in Confluent Schema Registry.
-2. **Microservice Schema Consumption**: Each microservice maintains a reference to the schemas it uses. For example, a `schemas.json` file located at the root of each microservice contains a list of schema subjects used by that service.
-3. **Schema Retrieval and Code Generation**: The `schemas.json` file is used to retrieve the latest version of each schema from the Confluent Schema Registry. The schema code is then generated and can be used for development purpose.
-4. **Serialization**: Tools like `kafka-protobuf-serializer` (for Java) or `@kafkajs/confluent-schema-registry` (for JavaScript) can be used to ensure that the data is serialized using the latest version of the schema, as retrieved from the registry regardless of the entity generated in the previous step.
+1. **Centralized Schema Management**: Store all schemas in a version-controlled Git repository. Updates to `versions.json` trigger builds and registrations in the Schema Registry.
+2. **Microservice Integration**: Each microservice uses versioned and packaged models generated by the central repository. These models ensure consistency across services.
+3. **Serialization**: Use tools like `kafka-protobuf-serializer` (Java) or `@kafkajs/confluent-schema-registry` (JavaScript) to serialize data with the latest schema version retrieved from the registry.
 
-### Benefits:
+---
 
-- **Simplified Schema Management**: All schemas are managed in one place, avoiding duplication and inconsistencies across services.
-- **Automation and Consistency**: CI/CD integration ensures that schema updates are automatically built and registered.
-- **Versioning and Compatibility**: Each microservice always has access to the latest version of the schemas, while schema changes can be version-controlled and managed centrally.
+### Benefits
+
+- **Simplified Management**: Centralized schemas reduce duplication and inconsistencies.
+- **Automation**: CI/CD integration ensures schema updates are handled automatically.
+- **Compatibility**: Versioned models guarantee consistency across services.
+
+---
 
 ## Contributing
 
-Contributions are welcome! If you have any suggestions or improvements, please open an issue or submit a pull request.
-To contribute to this project, please refer to the [Contributing Guide](CONTRIBUTING.md) and the [how-to](how-to/overview.md) directory.
+We welcome contributions! If you have suggestions or improvements, please open an issue or submit a pull request.
+
+Refer to the [Contributing Guide](CONTRIBUTING.md) and [How-To Documentation](how-to/overview.md) for details on contributing.
+
+---
 
 ## License
 
-This project is licensed under the MIT License – see the LICENSE file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
