@@ -144,7 +144,9 @@ Adding a `versions.json` in the `common` directory is unnecessary because it is 
 
 ---
 
-### Schema Content
+### Example Schema Content
+
+Here is an example on how the model.proto should be structured. For more details on how to structure tour schema files by type, refer to the [Schema Content](#schema-content) section.
 
 #### `topic1/v1/model.proto`
 
@@ -168,6 +170,8 @@ message Model {
 
 ### Building Schemas
 
+The code below will generate a `build` directory with all the schemas grouped into folders, one per topic and version.
+
 ```typescript
 import { ConfigType, ConfluentRegistry, Manager } from '@charlescol/schema-manager';
 import * as path from 'path';
@@ -190,8 +194,6 @@ import * as path from 'path';
 })();
 ```
 
-The above code will build all the schemas and generate a `build` directory with all the schemas grouped into folders, one per topic and version.
-
 **Build Directory Structure:**
 
 ```bash
@@ -209,6 +211,8 @@ build/
   │   │   └── data2.proto # Depends on entity.proto
   │   │   └── entity.proto
 ```
+
+Each generated file is now ready to be registered in the schema registry.
 
 #### Generated `topic1/v1/model.proto`
 
@@ -308,15 +312,62 @@ If the file above is saved as `publish-schemas.ts`, you can run it with the foll
 tsc && node dist/publish-schemas.js
 ```
 
-## Schema Contents
+---
+
+## Schema Content
 
 Many information are resolved during the build using the versions.json file. This setup is in place to avoid code redundancy and allow for dynamic schema transformations
 
 ### Protobuf
 
 - The package doesn't have to be included in the schema, and will be included in the built schema anyway.
-- The import statement should reference only the file name and not the full file path.
-- The custom object name doin't need to include the package name (e.g. google.protobuf.Timestamp)
+- The import statement should reference only the file name and not the full file path (`import "common/v1/entity.proto";` ❌ `import "entity.proto";` ✅)
+- External imports can be used as usual (e.g. `import "google/protobuf/timestamp.proto"`)
+- The internal object name don't need to include the package name (e.g. `common.v1.Entity` ❌ `Entity` ✅)
+
+```protobuf
+// topic1/v1/data.proto
+syntax = "proto3";
+
+// Don't need to create a package.
+
+import "entity.proto"; // Only the file name is used without the full path
+import "google/protobuf/timestamp.proto"; // External import remains unchanged
+
+message Data {
+  string additional_info = 1;
+  google.protobuf.Timestamp created_at = 2; // External import remains unchanged
+  repeated Entity entities = 3; // Internal object name doesn't need to include the package name
+}
+```
+
+---
+
+### Avro
+
+- The namespace doesn't have to be included in the schema, and will be included in the built schema anyway.
+- The internal object name don't need to include the namespace name (e.g. `common.v1.Entity` ❌ `Entity` ✅)
+
+```json
+{
+  // Don't need to create a namespace (if you do it will be replaced anyway)
+  "type": "record",
+  "name": "Model",
+  "fields": [
+    {
+      "name": "description",
+      "type": "string"
+    },
+    {
+      "name": "entities",
+      "type": {
+        "type": "array",
+        "items": "Entity" // Internal object name doesn't need to include the namespace name
+      }
+    }
+  ]
+}
+```
 
 **In Protobuf files, the import statement should reference only the file name and not the full file path.** This is because dependency resolution is managed within the versions.json file, which allows the schema manager to dynamically assign the correct versioned dependencies for each import.
 
