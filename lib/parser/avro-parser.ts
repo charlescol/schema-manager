@@ -3,7 +3,7 @@ import AbstractParser from './abstract-parser';
 import SchemaType from '../types';
 
 export default class AvroParser extends AbstractParser {
-  protected schemaTypes = [SchemaType.AVRO];
+  protected allowedExtensions = ['.avsc', '.avro'];
   private static readonly primitiveTypes = [
     'null',
     'boolean',

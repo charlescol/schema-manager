@@ -1,4 +1,4 @@
-import { AvroTransformerConfig } from './transformer.types';
+import { AvroTransformerConfig, TransformParameters } from './transformer.types';
 import AbstractTransformer from './abstract-transformer';
 
 export default class AvroTransformer extends AbstractTransformer {
@@ -7,11 +7,11 @@ export default class AvroTransformer extends AbstractTransformer {
     super(config);
     this.namespaceBuilder = config.namespaceBuilder || ((filepath: string) => filepath.replace(/\//g, '.'));
   }
-  async transform(content: string, filePath: string): Promise<string> {
+  async transform(content: string, param: TransformParameters): Promise<string> {
     const schema = JSON.parse(content);
 
     /* Set namespace to filePath */
-    schema.namespace = this.namespaceBuilder(filePath);
+    schema.namespace = this.namespaceBuilder(param.filePath);
 
     /* Remove namespace prefixes in type references */
     function removeNamespace(obj: unknown): void {

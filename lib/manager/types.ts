@@ -1,3 +1,4 @@
+import { DEFAULT_BUILD_DIR } from '../common/const';
 import { ConfigType } from '../config/config.types';
 import AbstractRegistry from '../registry/abstract-registry';
 import { DependencyResolutionMode } from '../versions-extractor/types';

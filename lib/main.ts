@@ -48,20 +48,21 @@ import { ConfigType } from '../dist/config/config.types';
   let manager: Manager;
 
   switch (preset.toUpperCase()) {
-    case SchemaType.AVRO:
+    case SchemaType.AVRO: {
       manager = new Manager({
         schemaRegistry: registry,
         configType: ConfigType.AVRO,
       });
       await manager.build(`${SCHEMA_DIR}/avro`);
-
       break;
-    default:
+    }
+    default: {
       manager = new Manager({
         schemaRegistry: registry,
         configType: ConfigType.PROTOBUF,
       });
-      await manager.build(`${SCHEMA_DIR}/protobuf`);
+      await manager.build(`${SCHEMA_DIR}/schemas`);
+    }
   }
   await manager.register(subjectBuilder);
 })();

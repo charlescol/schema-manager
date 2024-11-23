@@ -31,7 +31,10 @@ export default class Builder {
 
         // Read the content from the source file
         const content = await fs.readFile(sourceFilePath, 'utf-8');
-        const transformedContent = await this.transformer.transform(content, relativeDir);
+        const transformedContent = await this.transformer.transform(content, {
+          filePath: relativeDir,
+          keys: Array.from(filesMap.keys()),
+        });
 
         // Write the content to the destination file
         await fs.writeFile(destinationFilePath, transformedContent);

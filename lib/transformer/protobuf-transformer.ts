@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { ProtobufTransformerConfig } from './transformer.types';
+import { ProtobufTransformerConfig, TransformParameters } from './transformer.types';
 import AbstractTransformer from './abstract-transformer';
 
 export default class ProtobufTransformer extends AbstractTransformer {
@@ -8,17 +8,20 @@ export default class ProtobufTransformer extends AbstractTransformer {
     super(config);
     this.namespaceBuilder = config.namespaceBuilder || ((filepath: string) => filepath.replace(/\//g, '.'));
   }
-  async transform(content: string, filePath: string): Promise<string> {
+  async transform(content: string, param: TransformParameters): Promise<string> {
     /* Update import statements to use paths relative to `filePath` */
     const importRegex = /import\s+"([^"]+)";/g;
-    let transformedContent = content.replace(importRegex, (_, importPath) => {
+    let transformedContent = content.replace(importRegex, (match, importPath) => {
       const importedFileName = path.basename(importPath);
-      const newImportPath = path.posix.join(filePath, `${importedFileName}`);
-      return `import "${newImportPath}";`;
+      if (param.keys.includes(importedFileName.toLowerCase())) {
+        const newImportPath = path.posix.join(param.filePath, `${importedFileName}`);
+        return `import "${newImportPath}";`;
+      }
+      return match;
     });
 
     /* Update or insert the package statement based on `filePath` */
-    const packageName = this.namespaceBuilder(filePath);
+    const packageName = this.namespaceBuilder(param.filePath);
     const packageRegex = /^\s*package\s+[\w\.]+;/m;
     if (packageRegex.test(transformedContent)) {
       transformedContent = transformedContent.replace(packageRegex, `package ${packageName};`);
@@ -28,9 +31,12 @@ export default class ProtobufTransformer extends AbstractTransformer {
 
     /* Remove package prefix from field type declarations */
     const fieldTypeRegex = /^(\s*(?:repeated|optional|required)?\s*)([\w\.]+)(\s+\w+\s*=\s*\d+;)/gm;
-    transformedContent = transformedContent.replace(fieldTypeRegex, (_, p1, p2, p3) => {
+    transformedContent = transformedContent.replace(fieldTypeRegex, (match, p1, p2, p3) => {
       const typeName = p2.split('.').pop();
-      return p1 + typeName + p3;
+      if (param.keys.includes(typeName.toLowerCase())) {
+        return `${p1}${typeName}${p3}`;
+      }
+      return match;
     });
 
     return transformedContent;

@@ -32,7 +32,7 @@ export default class Manager {
 
   public async build(baseDirectory: string, buildDir = DEFAULT_BUILD_DIR): Promise<void> {
     const versionsResolution = await this.versionDataExtractor.extract(baseDirectory);
-    new Builder(this.transformer).build(baseDirectory, versionsResolution.versionMap, buildDir);
+    await new Builder(this.transformer).build(baseDirectory, versionsResolution.versionMap, buildDir);
     console.log(`Schema build completed successfully`);
   }
   public async register(
@@ -40,7 +40,7 @@ export default class Manager {
     buildDir = DEFAULT_BUILD_DIR,
     subjectsDir = DEFAULT_SUBJECTS_DIR,
   ): Promise<void> {
-    const dependenciesResult = this.parser.parse(buildDir);
+    const dependenciesResult = await this.parser.parse(buildDir);
     const order = topologicalSort(dependenciesResult.dependenciesMap);
     const subjects = new Map<string, string>();
 

@@ -1,42 +1,30 @@
-# Schema Manager
-
-![npm version](https://img.shields.io/npm/v/@charlescol/schema-manager)
-![Build Status](https://github.com/charlescol/schema-manager/actions/workflows/npm-publish.yml/badge.svg)
-![npm downloads](https://img.shields.io/npm/dm/@charlescol/schema-manager)
-![License](https://img.shields.io/github/license/charlescol/schema-manager)
-
-## Automating Schema Versioning and Dependency Management
+## Centralize Your Schema Files in One Git Repository
 
 ### Why Schema Manager?
 
-- **Centralized Schema Management**: Unify all your schema files (Avro, Protobuf, JSON) in one place.
-- **Automated Registration and Versioning**: Automatically handles dependencies and publishes schemas in the correct order.
-- **Flexible and Configurable**: Works with Confluent Schema Registry and is extendable to other registries.
-- **Quick Start Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)
+- Centralize schema files (Avro, Protobuf, JSON) in a single **Git repository**.
+- Integrate schema deployment to the **Schema Registry** and automate model generation and distribution in a centralized **CI/CD pipeline**.
+- Automate schema transformations.
+- Resolve schema dependencies in JSON configurations to eliminate redundancy and improve maintainability.
 
-**Give it a try to see how Schema Manager simplifies schema management for distributed services!**
+**Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)  
+**Guide**: [Scenario Example](#scenario-example)
 
 ---
 
 ### Introduction
 
-In modern microservices architectures, separating concerns is critical for scalability and maintainability. Managing schema files (e.g., Avro, Protobuf, JSON) across services can become complex and error-prone, especially when each microservice is responsible for publishing schemas to a schema registry (e.g., Confluent Schema Registry).
+In modern microservices architectures, separating concerns is essential for achieving scalability and maintainability. Managing schema files (e.g., Avro, Protobuf, JSON) across multiple services can quickly become complex and error-prone, especially when each microservice maintains its own schemas and handles their publication to a schema registry (e.g., Confluent Schema Registry).
 
-Schema Manager solves this by centralizing schema management and delegation. Instead of allowing microservices to handle schema publication directly, Schema Manager automates the versioning, dependency resolution, and registration of schemas in a centralized repository. This approach keeps microservices lightweight, while Schema Manager handles all the complexity of schema registration and lifecycle management.
+**Schema Manager** addresses these challenges by centralizing schema management and delegation. It maintains schema files in a centralized Git repository and handles deployment to the target Schema Registry (typically through a CI/CD pipeline).
 
-This is important to note that Schema Manager is not intended to replace the schema Registry. Instead, it acts as a management layer that centralizes schemas in a single repository and automates their publication to the target registry.
+By enforcing this separation of concerns, Schema Manager simplifies schema management across services and ensures **a clear separation of responsibilities**, allowing microservices to remain lightweight and focused.
 
-By enforcing this separation of concerns, Schema Manager simplifies schema management across services, making the system more scalable, consistent, and reliable.
+For a more comprehensive explanation of how Schema Manager integrates into modern Kafka-oriented applications involving multiple microservices and languages, refer to the [Example of Integration with Schema Manager](#example-of-integration-with-schema-manager) section. This section covers schema publication, as well as the generation and distribution of models across services.
 
-An example of integration for Schema Manager in managing all the schemas in a Kafka-oriented application involving multiple microservices can be found in the [Example of Integration with Schema Manager](#example-of-integration-with-schema-manager) section.
+---
 
 ### Quick Start
-
-[Try the example here in just a few minutes](https://github.com/charlescol/schema-manager-example)
-
-```bash
-git clone https://github.com/charlescol/schema-manager-example.git
-```
 
 The Schema Manager is distributed via NPM:
 
@@ -44,25 +32,22 @@ The Schema Manager is distributed via NPM:
 npm install @charlescol/schema-manager
 ```
 
-After installation, organize your schema files in versioned directories and create a versions.json file to map versions. Then run Schema Manager to automatically register your schemas with the schema registry.
+The minimal requirement is to initiate an npm project within your repository and install the package. The schema manager capabilities can be used programmatically in a JavaScript script file (example [here](#full-code)).
 
-### Key Features
+**Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)
 
-- **Centralized Schema Management:** Maintain all schema files (e.g., .proto, .avsc) in one repository, with versioning handled through a structured approach.
-- **Automated Registration:** Automatically register schema file in the schema registry in the correct order based on their dependencies.
-- **Version Control:** Use `versions.json` files to manage schema versions and ensure consistency across services.
-- **Dependency Resolution:** Schema Manager parses the schema files to detect import and package statements, building a dependency graph. It automatically resolves dependencies using topological sorting to ensure schemas are registered in the correct order, with dependent schemas processed first.
-- **Configurable for Confluent Schema Registry:** Seamless integration with Confluent Schema Registry, easily extendable to other registries.
-- **Error Handling and Logging:** It includes error handling for unresolved imports, cyclic dependencies, and failed schema registrations. It logs detailed error messages to help you quickly identify and fix issues.
+---
 
-## Available Parsers
+## Supported Schema Formats
 
-| **Parser**   | **Class Name**   | **Supported Formats** | **Description**                                                                             |
-| ------------ | ---------------- | --------------------- | ------------------------------------------------------------------------------------------- |
-| **Avro**     | `AvroParser`     | `.avro`, `.avsc`      | Parses Avro schema files, supports extracting dependencies from `.avro` and `.avsc` files.  |
-| **Protobuf** | `ProtobufParser` | `.proto`              | Parses Protobuf schema files, identifies package names and imports to resolve dependencies. |
+| **Config**   | **Supported Formats** | **Description**                                                                            |
+| ------------ | --------------------- | ------------------------------------------------------------------------------------------ |
+| **Avro**     | `.avro`, `.avsc`      | Parses Avro schema files, supports extracting dependencies from `.avro` and `.avsc` files. |
+| **Protobuf** | `.proto`              | Parses Protobuf schema files, supports extracting dependencies from `.proto` files.        |
 
 Please refer to the [Parser Documentation](how-to/create-parser.md) for more details on how to create a parser.
+
+---
 
 ## Available Registries
 
@@ -72,49 +57,41 @@ Please refer to the [Parser Documentation](how-to/create-parser.md) for more det
 
 Please refer to the [Registry Documentation](how-to/create-registry.md) for more details on how to create a registry.
 
-## Manager Parameters
-
-Below the parameters that can be passed to the `Manager` constructor.
-
-| Parameter                  | Type                       | Description                                                                                                                            | Required |
-| -------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `schemaRegistry`           | `AbstractRegistry`         | The schema registry to use for registering schemas.                                                                                    | Yes      |
-| `parser`                   | `AbstractParser`           | The parser to use for parsing schema files.                                                                                            | Yes      |
-| `dependencyResolutionMode` | `DependencyResolutionMode` | The dependency resolution mode to use. Defaults to `IMPLICIT`. Set to `EXPLICIT` to enforce each file's inclusion in only one version. | No       |
-
-## Registry Parameters
-
-Below the parameters that can be passed to the `AbstractRegistry` constructor.
-
-| Parameter           | Type                      | Description                                         | Required |
-| ------------------- | ------------------------- | --------------------------------------------------- | -------- |
-| `schemaRegistryUrl` | `string`                  | The URL of the schema registry.                     | Yes      |
-| `headers`           | `Record<string, unknown>` | Additional headers to include in requests.          | No       |
-| `body`              | `Record<string, unknown>` | Additional body parameters to include in requests.  | No       |
-| `queryParams`       | `Record<string, unknown>` | Additional query parameters to include in requests. | No       |
+---
 
 ### How It Works
 
 1. **Organize Your Schemas:**
 
-   - Place your files in versioned directories (e.g., v1, v2) and map them in `versions.json`. Please consider the [formatting considerations](#formatting-considerations-for-schemas) when importing files for Protobuf schemas.
+   - Place your files in versioned directories (e.g., `v1`, `v2`) and map them in `versions.json`. Refer to the [versions file structure](#versions-file-structure) for details on how to structure the `versions.json` file.
 
-2. **Run Schema Manager:**
+2. **Build Schemas:**
 
-   - Schema Manager parses .proto files to detect import and package statements. Dependencies are resolved using topological sorting to ensure schemas are registered in the correct order.
+   - Schema Manager produces a `build` directory with all the schemas grouped into folders. Each folder contains the transformed schema with the appropriate namespaces and dependencies.
 
 3. **Automated Registration:**
-   - Once dependencies are resolved, Schema Manager registers the schemas with the schema registry in the correct order.
+
+   - Schema Manager processes the `build` folder to register the schemas in the target Schema Registry in the correct order based on dependencies.
 
 ## Scenario Example
 
 Consider a system managing a set of Protobuf schemas for an event-driven architecture. Each schema has multiple versions and dependencies.
 
-**Note:** Multiple examples, including those mentioned here with different schema types (Protobuf, Avro, etc.), are located within the repository at `./examples`. These examples showcase various use cases and help demonstrate how Schema Manager resolves dependencies and registers schemas for different schema formats. You can explore these to better understand how to set up your own schema management workflow.
+If you don’t already have a project set up, you can create one with the following commands:
 
-In this example, we have one topic "topic1" as well as a common namespace. Our topic contains multiple versions of schema files, with version mapping handled through versions.json files.
+```bash
+mkdir schema-manager-example
+cd schema-manager-example
+npm init -y && npm install @charlescol/schema-manager
+```
 
-**File Structure:**
+In this example, we have two topics named "topic1" and "topic2," as well as a common folder used for shared schemas.
+
+The topics can contain multiple major versions of schema files. A JSON file named `versions.json` is used to manage them for each topic.
+
+In our case, let's say that our schemas for `topic1` contain two major versions due to breaking changes in a file called `data.proto`:
+
+### File Structure
 
 ```bash
 example-schemas/
@@ -131,16 +108,14 @@ example-schemas/
   │   └── versions.json          # Version mapping for topic2 (v1)
   ├── common/
   │   ├── v1/
-  │   │   └── entity.proto       # Schema for test entity
+  │   │   └── entity.proto       # Schema for shared entity
 ```
 
-It is important to note that the schema manager handles implicit file import. This means that two different schemas will be published for model.proto (topic1/v1 and topic1/v2) and two different schemas will be published for entity.proto (topic1/v1 and topic2/v1) although they are the same file.
+In the above structure, the folder `topic1/v2` contains only one file, even though there are three schemas in v2 (`model.proto` → `data.proto` → `entity.proto`).
 
-**Note:** You can force the file to be published only once by using the EXPLICIT mode, in this example this would raise an error because the model.proto and entity.proto files are imported twice.
+This is because `versions.json` is used to resolve dependencies. If a file is the same across different versions, it doesn't need to be duplicated. The Schema Manager handles this implicit import mechanism to avoid schema duplication.
 
-In our case adding a versions.json in the common directory is not necessary because common directory are not meant to be registered as separate subjects in the schema registry. Instead, they serve as shared dependencies that are imported by other schemas located in the service-specific directories.
-
-**versions.json for topic1:**
+### `versions.json` for `topic1`
 
 ```json
 {
@@ -156,7 +131,7 @@ In our case adding a versions.json in the common directory is not necessary beca
 }
 ```
 
-**versions.json for topic2:**
+### `versions.json` for `topic2`
 
 ```json
 {
@@ -167,81 +142,179 @@ In our case adding a versions.json in the common directory is not necessary beca
 }
 ```
 
-Schema Manager supports both standard version numbers (e.g., v1, v2) and custom version strings (e.g., v1.0, alpha, beta). This allows flexibility in version naming, while Schema Manager handles versioning and dependency resolution across topics and versions
+Adding a `versions.json` in the `common` directory is unnecessary because it is not meant to be registered independently.
 
-**Note:** A single versions.json could have been used to manage all the topics in a centralized way. Additionally, Schema Manager supports multiple versions.json files within the same directory.
+### Additional Remarks
 
-**Note2:** The schema name must be unique across a given version of a topic (this include all the dependencies referenced in the versions.json file for the version).
+- Schema Manager supports any string for version names (e.g., `v1`, `v1.0`, `alpha`).
+- The schema name must be unique across a given version of a topic.
+- Alternatively, a single `versions.json` file could be used to manage all the topics centrally.
 
-### Schema Registration Order:
+**Note:** Multiple examples, including those mentioned here with different schema types (Protobuf, Avro, etc.), can be found in the repository at `./examples`. Explore these to better understand schema management workflows.
 
-1. **Step 1**: `entity.proto` in `topic1/v2` is registered because `data.proto` depends on it.
-1. **Step 1**: `entity.proto` in `topic2/v1` is registered because `data2.proto` depends on it.
-1. **Step 3**: `data.proto` in `topic1/v1` is registered because `model.proto` depends on it.
-1. **Step 2**: `data.proto` from `topic1/v2`, is registered because `model.proto` depends on it.
-1. **Step 5**: Once `data.proto` in `topic1/v1` is registered, `model.proto` from `topic1/v1` can be registered.
-1. **Step 6**: Finally, `model.proto` from `topic1/v2`, which depends on `data.proto` from `v2`
+---
 
-### Usage Example
+### Example Schema Content
 
-```typescript
-import { ConfluentRegistry, Manager, ProtobufParser } from '@charlescol/schema-manager';
-import * as path from 'path';
+Here is an example on how the model.proto should be structured. For more details on how to structure tour schema files by type, refer to the [Schema Content](#schema-content) section.
 
-const baseDirectory = path.resolve(__dirname, '../schemas'); // Path to the directory containing your schemas
+#### `topic1/v1/model.proto`
 
-const registry = new ConfluentRegistry({
-  schemaRegistryUrl: SCHEMA_REGISTRY_URL,
-  // Below part is optional, used to override queries to the schema registry
-  body: {
-    compatibilityGroup: 'application.major.version',
-  },
-  queryParams: {
-    normalize: true,
-  },
-  headers: {
-    'Content-Type': 'application/vnd.schemaregistry.v1+json', // Default value is application/json
-  },
-});
+```protobuf
+// Information regarding the package, namespace, and import path will be completed automatically during the build process
+syntax = "proto3";
 
-async function main() {
-  // create a manager and load all schemas
-  const manager = new Manager({
-    schemaRegistry: registry,
-    parser: new ProtobufParser(),
-  });
-  await manager.loadAll(baseDirectory, subjectBuilder);
+// Don't need to create a package.
+
+// Don't need to import the full path, only the filename is enough.
+import "data.proto";
+
+message Model {
+  Data data = 1; // Don't need to reference the namespace, only the message name is enough.
+  string description = 2;
+  repeated string tags = 3;
 }
-
-// Function to provide, used to build the subject for each schema file.
-// This is an example implementation, you can customize it based on your own versioning and naming rules.
-function subjectBuilder(fullVersionPath: string, filepath: string): string {
-  // Extract topic and version
-  const [topic, version] = fullVersionPath.split('/');
-  // Extract the filename without extension
-  const filename = filepath.split('/').pop()?.split('.')[0] || '';
-  // Return the constructed subject
-  return `${topic}.${filename}.${version}`;
-}
-
-main().catch((error) => {
-  console.error('Error registering schemas:', error);
-  process.exit(1);
-});
 ```
 
-The `subjectBuilder` function is responsible for generating the subject name for each schema that is registered in the schema registry. The subject is a unique identifier used by the registry to track schema versions and manage updates. The function takes two parameters:
+---
 
-- **fullVersionPath: `string`:** The path to the versions.json directory with the version name (key in the json) {pathToVersion}/{versionName} (e.g., `topic1/v1`).
-- **filepath: `string`:** This is the relative file path of the schema file (e.g., `example-schemas/v1/model.proto`).
+### Building Schemas
 
-The function above generates the following subject names for the topic1 (`fullVersionPath`, `filepath` → `generated subject`):
+The code below will generate a `build` directory with all the schemas grouped into folders, one per topic and version.
 
-- `topic1/v1`, `topic1/v1/data.proto` → `topic1.data.v1`
-- `topic1/v1`, `topic1/v1/model.proto` → `topic1.model.v1`
-- `topic1/v2`, `topic1/v2/data.proto` → `topic1.data.v2`
-- `topic1/v2`, `topic1/v1/model.proto` → `topic1.model.v2`
-- `topic1/v2`, `common/v1/entity.proto` → `topic1.entity.v2`
+```typescript
+import { ConfigType, ConfluentRegistry, Manager } from '@charlescol/schema-manager';
+import * as path from 'path';
+
+(async () => {
+  const SCHEMA_REGISTRY_URL = process.env.SCHEMA_REGISTRY_URL || 'http://localhost:8081';
+  const SCHEMA_DIR = path.resolve(__dirname, '../schemas');
+
+  // Create the schema registry
+  const registry = new ConfluentRegistry({
+    schemaRegistryUrl: SCHEMA_REGISTRY_URL,
+  });
+
+  // Create the manager
+  const manager = new Manager({
+    schemaRegistry: registry,
+    configType: ConfigType.PROTOBUF, // Specify the config type
+  });
+  await manager.build(SCHEMA_DIR); // Build the schemas
+})();
+```
+
+**Build Directory Structure:**
+
+```bash
+build/
+  ├── topic1/
+  │   ├── v1/
+  │   │   ├── data.proto
+  │   │   └── model.proto # Depends on data.proto
+  │   ├── v2/
+  │   │   └── data.proto # Depends on entity.proto
+  │   │   └── model.proto # Depends on data.proto
+  │   │   └── entity.proto
+  ├── topic2/
+  │   ├── v1/
+  │   │   └── data2.proto # Depends on entity.proto
+  │   │   └── entity.proto
+```
+
+Each generated file is now ready to be registered in the schema registry.
+
+#### Generated `topic1/v1/model.proto`
+
+```protobuf
+syntax = "proto3";
+
+package topic1.v1; // Resolved automatically
+
+import "topic1/v1/data.proto"; // Resolved automatically
+
+message Model {
+  topic1.v1.Data data = 1; // Resolved automatically
+  string description = 2;
+  repeated string tags = 3;
+}
+```
+
+By default, the namespace is generated by replacing `/` with `.` in the path. This can be customized by providing a custom namespace builder function to the manager.
+
+---
+
+### Publish to the Registry
+
+Once the schemas are built, they can be deployed in the registry.
+
+```typescript
+function subjectBuilder(filepath: string): string {
+  const [topic, version, filename] = filepath.split('/'); // Extract topic and version
+  const filenameWithoutExt = filename?.split('.')[0] || ''; // Extract the filename without extension
+  return `${topic}.${filenameWithoutExt}.${version}`; // Return the constructed subject
+}
+
+await manager.register(subjectBuilder); // Register the schemas
+```
+
+The `subjectBuilder` function generates the subject name for each schema registered in the schema registry. The subject is a unique identifier used by the registry to track a schema.
+
+The `register` function builds a dependency graph based on schema dependencies and registers them in the correct order using a topological sorting algorithm.
+
+#### Example of Subject Names Generated by `subjectBuilder`
+
+- `topic1/v1/data.proto` → `topic1.data.v1`
+- `topic1/v1/model.proto` → `topic1.model.v1`
+- `topic1/v2/data.proto` → `topic1.data.v2`
+
+#### Example of Optimal Registration Order (Based on Dependencies)
+
+1. `topic1/v1/data.proto`
+2. `topic1/v2/entity.proto`
+3. `topic2/v1/entity.proto`
+4. `topic1/v2/data.proto`
+5. `topic2/v2/data2.proto`
+6. `topic1/v1/model.proto`
+7. `topic1/v2/model.proto`
+
+---
+
+### Full Code
+
+Below is the complete code example for the steps above.
+
+#### `publish-schemas.ts`
+
+```typescript
+import { ConfigType, ConfluentRegistry, Manager } from '@charlescol/schema-manager';
+import * as path from 'path';
+
+(async () => {
+  const SCHEMA_REGISTRY_URL = process.env.SCHEMA_REGISTRY_URL || 'http://localhost:8081';
+  const SCHEMA_DIR = path.resolve(__dirname, '../schemas');
+
+  const registry = new ConfluentRegistry({
+    // Create the schema registry
+    schemaRegistryUrl: SCHEMA_REGISTRY_URL,
+  });
+
+  const manager = new Manager({
+    // Create the manager
+    schemaRegistry: registry,
+    configType: ConfigType.PROTOBUF,
+  });
+  await manager.build(SCHEMA_DIR); // Build the schemas
+  await manager.register(subjectBuilder); // register the schemas
+})();
+
+// Function to provide, used to build the subject for each schema file.
+function subjectBuilder(filepath: string): string {
+  const [topic, version, filename] = filepath.split('/');
+  const filenameWithoutExt = filename?.split('.')[0] || '';
+  return `${topic}.${filenameWithoutExt}.${version}`; // Return the constructed subject
+}
+```
 
 If the file above is saved as `publish-schemas.ts`, you can run it with the following command to compile and execute it:
 
@@ -249,48 +322,109 @@ If the file above is saved as `publish-schemas.ts`, you can run it with the foll
 tsc && node dist/publish-schemas.js
 ```
 
-## Formatting considerations for schemas
+---
 
-**In Protobuf files, the import statement should reference only the file name and not the full file path.** This is because dependency resolution is managed within the versions.json file, which allows the schema manager to dynamically assign the correct versioned dependencies for each import.
+## Schema Content
 
-The schema manager supports an implicit import mechanism, enabling the same file to be imported in multiple versions without conflict. This flexibility allows each version of a schema to maintain its own set of dependencies, even if those dependencies differ across versions.
+Many details are dynamically resolved during the build process using the `versions.json` file. This setup avoids code redundancy and enables dynamic schema transformations.
 
-For instance, if a file is used in multiple schema versions with different dependencies in each, the import must not rely on a static dependency path. Instead, each version will resolve dependencies according to its specific versions.json configuration.
+### Protobuf
+
+- **Package Handling**: The package is automatically included during the build process and does not need to be specified in the schema.
+- **Imports**: Import statements should reference only the file name without the full path (e.g., `import "entity.proto";` ✅, not `import "common/v1/entity.proto";` ❌).
+- **External Imports**: External imports (e.g., `google/protobuf/timestamp.proto`) remain unchanged.
+- **Object Names**: Internal object references do not need to include the package name (e.g., `Entity` ✅, not `common.v1.Entity` ❌).
+
+```protobuf
+// topic1/v1/data.proto
+syntax = "proto3";
+
+// No need to create a package.
+
+import "entity.proto"; // Use only the file name
+import "google/protobuf/timestamp.proto"; // External imports are unchanged
+
+message Data {
+string additional_info = 1;
+google.protobuf.Timestamp created_at = 2; // External imports are unchanged
+repeated Entity entities = 3; // Internal object names exclude the package name
+}
+```
+
+---
+
+### Avro
+
+- **Namespace Handling**: Namespaces are automatically included during the build process and do not need to be specified in the schema.
+- **Object Names**: Internal object references do not need to include the namespace name (e.g., `Entity` ✅, not `common.v1.Entity` ❌).
+
+```json
+{
+  "type": "record",
+  "name": "Model",
+  "fields": [
+    {
+      "name": "description",
+      "type": "string"
+    },
+    {
+      "name": "entities",
+      "type": {
+        "type": "array",
+        "items": "Entity"
+      }
+    }
+  ]
+}
+```
+
+---
 
 ## Future Plans and Roadmap
 
-We plan to extend Schema Manager to support:
+We aim to extend Schema Manager with the following features:
 
-- Support for **other schema registries** beyond Confluent Schema Registry.
-- Addition of bigger set of supported formats, alongside the existing parsers.
-- A command-line interface (CLI) to manage schemas and visualize dependencies more easily.
+- **Support for Additional Schema Registries**: Expanding beyond Confluent Schema Registry to support other platforms.
+- **Expanded Format Support**: Adding parsers for more schema types beyond Protobuf, Avro, and JSON.
+- **Complex Transformations**: Enabling advanced schema transformations, such as adding options in Protobuf files to control future code generation.
+
+---
 
 ## Example of Integration with Schema Manager
 
-A common use case for Schema Manager is managing all the schemas in a Kafka-oriented application involving multiple microservices.
+A typical use case for Schema Manager is managing schemas in a Kafka-oriented application with multiple microservices. By centralizing schemas in a single repository, you can automate schema management tasks through a CI/CD pipeline.
 
-By using a **centralized schema registry**, you eliminate the need for each microservice to manage schemas independently or duplicate schema code across the services. Instead, each microservice only retrieves the schemas it needs from the centralized registry.
+### Pipeline Tasks
 
-The centralized schema repository is stored in a dedicated repository, which includes an NPM integration to include the Schema Manager. A small script (like the one provided in the [Scenario Example](#usage-example) section) is used to automatically register and update the schemas. Whenever a change is detected in the `versions.json` file within the schema directory, this can trigger a new build and schema registration, typically through a CI/CD pipeline.
+1. **Build Schemas**: Generate schema files from source.
+2. **Register Schemas**: Deploy schemas to the schema registry.
+3. **Code Generation**: Generate code for schemas in target programming languages.
+4. **Package Distribution**: Distribute generated code as packages (e.g., Maven, NPM, PyPI).
 
-### Workflow Example:
+### Workflow Example
 
-1. **Centralized Schema Management**: The schema repository is versioned and stored in a central repository. Any changes to the schemas (tracked in `versions.json`) will trigger a new schema build and registration in Confluent Schema Registry.
-2. **Microservice Schema Consumption**: Each microservice maintains a reference to the schemas it uses. For example, a `schemas.json` file located at the root of each microservice contains a list of schema subjects used by that service.
-3. **Schema Retrieval and Code Generation**: The `schemas.json` file is used to retrieve the latest version of each schema from the Confluent Schema Registry. The schema code is then generated and can be used for development purpose.
-4. **Serialization**: Tools like `kafka-protobuf-serializer` (for Java) or `@kafkajs/confluent-schema-registry` (for JavaScript) can be used to ensure that the data is serialized using the latest version of the schema, as retrieved from the registry regardless of the entity generated in the previous step.
+1. **Centralized Schema Management**: Store all schemas in a version-controlled Git repository. Updates to `versions.json` trigger builds and registrations in the Schema Registry.
+2. **Microservice Integration**: Each microservice uses versioned and packaged models generated by the central repository. These models ensure consistency across services.
+3. **Serialization**: Use tools like `kafka-protobuf-serializer` (Java) or `@kafkajs/confluent-schema-registry` (JavaScript) to serialize data with the latest schema version retrieved from the registry.
 
-### Benefits:
+---
 
-- **Simplified Schema Management**: All schemas are managed in one place, avoiding duplication and inconsistencies across services.
-- **Automation and Consistency**: CI/CD integration ensures that schema updates are automatically built and registered.
-- **Versioning and Compatibility**: Each microservice always has access to the latest version of the schemas, while schema changes can be version-controlled and managed centrally.
+### Benefits
+
+- **Simplified Management**: Centralized schemas reduce duplication and inconsistencies.
+- **Automation**: CI/CD integration ensures schema updates are handled automatically.
+- **Compatibility**: Versioned models guarantee consistency across services.
+
+---
 
 ## Contributing
 
-Contributions are welcome! If you have any suggestions or improvements, please open an issue or submit a pull request.
-To contribute to this project, please refer to the [Contributing Guide](CONTRIBUTING.md) and the [how-to](how-to/overview.md) directory.
+We welcome contributions! If you have suggestions or improvements, please open an issue or submit a pull request.
+
+Refer to the [Contributing Guide](CONTRIBUTING.md) and [How-To Documentation](how-to/overview.md) for details on contributing.
+
+---
 
 ## License
 
-This project is licensed under the MIT License – see the LICENSE file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
