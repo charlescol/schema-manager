@@ -352,7 +352,6 @@ message Data {
 
 ```avsc
 {
-  // Don't need to create a namespace (if you do it will be replaced anyway)
   "type": "record",
   "name": "Model",
   "fields": [
@@ -364,7 +363,7 @@ message Data {
       "name": "entities",
       "type": {
         "type": "array",
-        "items": "Entity" // Internal object name doesn't need to include the namespace name
+        "items": "Entity"
       }
     }
   ]
