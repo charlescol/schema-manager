@@ -1,5 +1,10 @@
 ## Centralize Your Schema Files in One Git Repository
 
+![npm version](https://img.shields.io/npm/v/@charlescol/schema-manager)
+![Build Status](https://github.com/charlescol/schema-manager/actions/workflows/npm-publish.yml/badge.svg)
+![npm downloads](https://img.shields.io/npm/dm/@charlescol/schema-manager)
+![License](https://img.shields.io/github/license/charlescol/schema-manager)
+
 ### Why Schema Manager?
 
 - Centralize schema files (Avro, Protobuf, JSON) in a single **Git repository**.
