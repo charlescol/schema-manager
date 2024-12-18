@@ -13,7 +13,7 @@ export default class ProtobufTransformer extends AbstractTransformer {
     const importRegex = /import\s+"([^"]+)";/g;
     let transformedContent = content.replace(importRegex, (match, importPath) => {
       const importedFileName = path.basename(importPath);
-      if (param.keys.includes(importedFileName.toLowerCase())) {
+      if (param.keys.includes(importedFileName.split('.')[0].toLowerCase())) {
         const newImportPath = path.posix.join(param.filePath, `${importedFileName}`);
         return `import "${newImportPath}";`;
       }
