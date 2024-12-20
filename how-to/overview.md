@@ -12,6 +12,8 @@ Here’s a high-level flow of the schema registration process:
 
 ![Schema Manager Diagram](assets/overview-diagram.png)
 
+The above diagram contains two stages: the **Build Stage** and the **Registration Stage**. These two methods are exposed by the manager class.
+
 ---
 
 ## **Flow of the Registration Process**
@@ -23,19 +25,31 @@ The registration process consists of four main steps, each handled by specific c
    - **Responsibility**: Extracts version data from the `versions.json` files in a given directory.
    - **Note**: This component is **not designed to be extended**, as the process should remain consistent across all schema registries and schema types.
 
-2. **Parser**
+2. **Builder**
 
-   - **Responsibility**: Reads schema files, extracts dependencies, and identifies unique namespaces or identifiers within the files.
+   - **Responsibility**: Create a build directory with the final version of the schemas used to register the schemas in the schema registry. It can also be used to generate code for the schemas.
+   - **Note**: This component is **not designed to be extended**, as the process should remain consistent across all schema registries and schema types.
+
+3. **Transformer**
+
+   - **Responsibility**: Called by the builder for each file. It uses the version data and schema content to transform the schemas into the final version.Since a schema can be used in multiple versions and topics, some information needs to be dynamically resolved during the build process (eg namespace or the import path in protobuf).
+   - **Extendable**: The transformer is designed to be customizable, allowing developers to implement support for different schema types.
+
+   See: [How to Create a Transformer](create-transformer.md) for more details.
+
+4. **Parser**
+
+   - **Responsibility**: Reads schema files, extracts dependencies, and name.
    - **Extendable**: The parser is designed to be customizable, allowing developers to implement support for different schema types.
 
    See: [How to Create a Parser](create-parser.md) for more details.
 
-3. **Sorting**
+5. **Sorting**
 
    - **Responsibility**: Builds a dependency graph and resolves dependencies using topological sorting to ensure schemas are registered in the correct order.
    - **Note**: This component is **not designed to be extended**, as the sorting process is universally applicable and doesn't require customization.
 
-4. **Schemas Registry**
+6. **Schemas Registry**
 
    - **Responsibility**: Handles the actual process of registering the schemas within the schema registry.
    - **Extendable**: Like the parser, the registry component is designed for extension, allowing developers to implement support for various schema registry services.
@@ -46,8 +60,9 @@ The registration process consists of four main steps, each handled by specific c
 
 ## **Extensibility**
 
-Both the **Parser** and **Schemas Registry** components are designed to be extended. These components can be customized to support different types of schemas or integrate with various schema registries. The sorting and version extraction components, on the other hand, remain fixed as they are universal to all schema management scenarios.
+The **Parser**, **Transformer**, and **Schemas Registry** components are designed to be extended.
 
+- To extend the transformer, follow the guide: [create-transformer.md](create-transformer.md)
 - To extend the parser, follow the guide: [create-parser.md](create-parser.md)
 - To extend the registry, follow the guide: [create-registry.md](create-registry.md)
 
@@ -55,7 +70,7 @@ Both the **Parser** and **Schemas Registry** components are designed to be exten
 
 ## **Detailed Input Output\***
 
-Consider a similar example as the one specified in the [Scenario Example](../README.md#scenario-example) section in the README.
+Consider a restricted but similar example as the one specified in the [Scenario Example](../README.md#scenario-example) section in the README.
 
 ```bash
 example-schemas/
@@ -89,24 +104,10 @@ example-schemas/
 
 ### Versions Extraction Output
 
-The versions extraction will return the following objects:
+The versions extraction will return the following object:
 
 ```typescript
-// FileMap (Map of file path to an array of version objects). version is the key in the versions.json file and full is directory of the versions.json with the key at the end {directory}/{version}
-Map(6) {
-  'common/v1/entity.proto' => [
-    { version: 'v2', full: 'topic1/v2' }
-  ],
-  'topic1/v1/data.proto' => [ { version: 'v1', full: 'topic1/v1' } ],
-  'topic1/v1/model.proto' => [
-    { version: 'v1', full: 'topic1/v1' },
-    { version: 'v2', full: 'topic1/v2' }
-  ],
-  'topic1/v2/data.proto' => [ { version: 'v2', full: 'topic1/v2' } ],
-}
-
-// VersionMap (Map of version directories + version name {directory}/{version}, to their mapping)
-Map(5) {
+versionMap: Map(4) {
   'topic1/v1' => Map(2) {
     'data' => 'topic1/v1/data.proto',
     'model' => 'topic1/v1/model.proto'
@@ -115,35 +116,42 @@ Map(5) {
     'data' => 'topic1/v2/data.proto',
     'model' => 'topic1/v1/model.proto',
     'entity' => 'common/v1/entity.proto'
-  }
+  },
 }
+```
+
+### Builder Output
+
+The builder will return the following folder structure:
+
+```bash
+example-schemas/
+  ├── topic1/
+  │   ├── v1/
+  │   │   ├── data.proto         # Schema for v1 data of topic1
+  │   │   └── model.proto        # Schema for v1 model (depends on topic1/v1/data.proto)
+  │   ├── v2/
+  │   │   ├── data.proto         # Schema for v2 data (depends on ./v2/v1/entity.proto)
+  │   │   ├── model.proto        # Schema for v1 model (depends on topic1/v1/data.proto)
+  │   │   └── entity.proto       # Schema for v2 entity of topic1
 ```
 
 ### Parser Output
 
 ```typescript
-{
-  // Used to map each file to all its dependencies, this is used to order the file registration
-  dependenciesMap: Map(6) {
-    'common/v1/entity.proto' => [],
-    'topic1/v1/data.proto' => [],
-    'topic1/v1/model.proto' => [ 'topic1/v1/data.proto', 'topic1/v2/data.proto' ],
-    'topic1/v2/data.proto' => [ 'common/v1/entity.proto' ]
-  },
-  // Used to map each file to its fully qualified namespace or identifier, this is used to format the dependency names for the registry
-  dependenciesNameMap: Map(6) {
-    'common/v1/entity.proto' => 'entity.proto',
-    'topic1/v1/data.proto' => 'data.proto',
-    'topic1/v1/model.proto' => 'model.proto',
-    'topic1/v2/data.proto' => 'data.proto',
-  },
-  // Used to map each file to a map of versions and their specific dependencies, topic1/v1/model.proto has two versions for the same file meaning that two different schemas need to be registered for the same file
-  dependenciesPartionnedMap: Map(6) {
-    'common/v1/entity.proto' => Map(2) { 'topic1/v2' => [] },
-    'topic1/v1/data.proto' => Map(1) { 'topic1/v1' => [] },
-    'topic1/v1/model.proto' => Map(2) { 'topic1/v1' => ['topic1/v1/data.proto'], 'topic1/v2' => ['topic1/v2/data.proto'] },
-    'topic1/v2/data.proto' => Map(1) { 'topic1/v2' => [Array] }
-  }
+dependenciesMap: Map(8) {
+  'topic1/v1/data.proto' => [],
+  'topic1/v1/model.proto' => [ 'topic1/v1/data.proto' ],
+  'topic1/v2/data.proto' => [ 'topic1/v2/entity.proto' ],
+  'topic1/v2/entity.proto' => [],
+  'topic1/v2/model.proto' => [ 'topic1/v2/data.proto' ]
+},
+dependenciesNameMap: Map(8) {
+  'topic1/v1/data.proto' => 'data.proto',
+  'topic1/v1/model.proto' => 'model.proto',
+  'topic1/v2/data.proto' => 'data.proto',
+  'topic1/v2/entity.proto' => 'entity.proto',
+  'topic1/v2/model.proto' => 'model.proto'
 }
 ```
 
@@ -152,9 +160,11 @@ Map(5) {
 The topological sorting will return the following array:
 
 ```typescript
-['common/v1/entity.proto', 'topic1/v1/data.proto', 'topic1/v2/data.proto', 'topic1/v1/model.proto'];
+[
+  'topic1/v1/data.proto',
+  'topic1/v2/entity.proto',
+  'topic1/v1/model.proto',
+  'topic1/v2/data.proto',
+  'topic1/v2/model.proto',
+];
 ```
-
-### Manager
-
-The Manager will then use the array from the topological sorting output, along with the `dependenciesNameMap` and `dependenciesPartitionedMap` from the Parser output, to publish the schemas

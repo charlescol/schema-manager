@@ -31,7 +31,7 @@ export default abstract class AbstractParser {
    * Extracts dependencies names from a given file.
    *
    * Dependencies could be imported files, referenced resources, or any other files that the current file relies on.
-   * A dependency name should not include the extension and must only consist of the file name
+   * A dependency name should include the filename with the extension
    * (without the file path). The result is case-insensitive.
    *
    * @param {string} filePath - The path to the file from which to extract dependencies.
@@ -63,6 +63,21 @@ export default abstract class AbstractParser {
     return AbstractParser.extensionToSchemaType[fileExtension] || SchemaType.UNKNOWN;
   }
 
+  /**
+   * Build a map of file dependencies and their corresponding names.
+   *
+   * This method scans the given base directory for files that match the allowed extensions,
+   * extracts dependencies and unique identifiers (names) for each file, and organizes
+   * this information.
+   *
+   * @param {string} baseDirectory - The root directory to scan for files and dependencies.
+   * @returns {Promise<FilesDependencies>} - An object containing:
+   *   - `dependenciesMap`: A map where the keys are relative file paths and the values are arrays
+   *      of relative paths to their dependencies.
+   *   - `dependenciesNameMap`: A map where the keys are relative file paths and the values are
+   *      unique names used for schema identification.
+   * @throws {Error} - Throws an error if parsing any file fails.
+   */
   public async parse(baseDirectory: string): Promise<FilesDependencies> {
     const files = getFiles(baseDirectory, [], this.allowedExtensions);
     const dependenciesMap: DependenciesMap = new Map<string, string[]>();
@@ -75,6 +90,7 @@ export default abstract class AbstractParser {
           folderFiles.set(relativePath, await listFilesInDirectory(path.dirname(file)));
 
         let dependencies = this.extractDependencies(file);
+        console.log(dependencies);
         const currentFolderFiles = folderFiles.get(relativePath);
         dependencies = dependencies
           .filter((dep) => currentFolderFiles!.includes(dep))

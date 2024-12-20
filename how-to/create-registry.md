@@ -1,5 +1,7 @@
 # How to Create a Schema Registry
 
+Before reading this section, it's recommended to read the [Overview](overview.md) section to understand the components of the Schema Manager.
+
 This documentation provides an overview of the AbstractRegistry class and its usage for managing schema registrations in a schema registry service. The AbstractRegistry class is intended to be extended to create specific implementations for different schema registry services (e.g., Confluent Schema Registry). It helps handle the process of registering schemas, managing schema dependencies, and handling schema references.
 
 ## Overview of AbstractRegistry

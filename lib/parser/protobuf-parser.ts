@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import AbstractParser from './abstract-parser';
-import SchemaType from '../types';
 
 export default class ProtobufParser extends AbstractParser {
   protected allowedExtensions = ['.proto'];

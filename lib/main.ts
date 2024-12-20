@@ -61,7 +61,7 @@ import { ConfigType } from '../dist/config/config.types';
         schemaRegistry: registry,
         configType: ConfigType.PROTOBUF,
       });
-      await manager.build(`${SCHEMA_DIR}/schemas`);
+      await manager.build(`${SCHEMA_DIR}/protobuf`);
     }
   }
   await manager.register(subjectBuilder);

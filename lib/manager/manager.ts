@@ -42,6 +42,7 @@ export default class Manager {
   ): Promise<void> {
     const dependenciesResult = await this.parser.parse(buildDir);
     const order = topologicalSort(dependenciesResult.dependenciesMap);
+    console.log(order);
     const subjects = new Map<string, string>();
 
     for (const filepath of order) {
@@ -55,12 +56,12 @@ export default class Manager {
       );
       const formattedSubject = subjectBuilder(filepath);
       subjects.set(filepath, formattedSubject);
-      await this.config.schemaRegistry.registerSchema(
-        formattedSubject,
-        fileContent,
-        references,
-        this.parser.getSchemaType(filepath),
-      );
+      // await this.config.schemaRegistry.registerSchema(
+      //   formattedSubject,
+      //   fileContent,
+      //   references,
+      //   this.parser.getSchemaType(filepath),
+      // );
       console.log(`Registered schema for ${formattedSubject}`);
     }
 
