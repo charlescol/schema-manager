@@ -56,12 +56,12 @@ export default class Manager {
       );
       const formattedSubject = subjectBuilder(filepath);
       subjects.set(filepath, formattedSubject);
-      // await this.config.schemaRegistry.registerSchema(
-      //   formattedSubject,
-      //   fileContent,
-      //   references,
-      //   this.parser.getSchemaType(filepath),
-      // );
+      await this.config.schemaRegistry.registerSchema(
+        formattedSubject,
+        fileContent,
+        references,
+        this.parser.getSchemaType(filepath),
+      );
       console.log(`Registered schema for ${formattedSubject}`);
     }
 

@@ -8,7 +8,7 @@ This document outlines the key components and flow of the schema registration pr
 
 ## **Diagram**
 
-Here’s a high-level flow of the schema registration process:
+Here’s a high-level flow of the schema build and registration process:
 
 ![Schema Manager Diagram](assets/overview-diagram.png)
 

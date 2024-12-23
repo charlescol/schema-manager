@@ -68,7 +68,7 @@ async transform(content: string, param: TransformParameters): Promise<string> {
 
 The above code snippet demonstrates how to update import statements and package statements based on the file path and the names of the dependencies. The namespaceBuilder function is used to generate the namespace name based on the file path.
 
-The first part updates the import statements to use paths relative to the file path, for example, if the file path is `topic1/v1/entity.proto`, the import statement `import "data.proto";` will be updated to `import "topic1/v1/data.proto";` (because the file `data.proto` is located in the same folder as the current file).
+The first part updates the import statements to use paths relative to the file path, for example, if the file path is `topic1/v1/entity.proto`, the import statement `import "data.proto";` will be updated to `import "topic1/v1/data.proto";` (because the file `data.proto` is located in the same folder as the current file). This part contains a conditional statement that checks if the imported file name is included in the list of keys because protobuf files can import external files (e.g., `import "google/protobuf/timestamp.proto";`).
 
 The second part updates or inserts the package statement based on the file path. For example, if the file path is `topic1/v1/entity.proto`, the package statement will be updated to `package topic1.v1;` (if using the default namespaceBuilder function).
 
