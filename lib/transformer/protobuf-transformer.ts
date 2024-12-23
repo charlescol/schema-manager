@@ -20,13 +20,25 @@ export default class ProtobufTransformer extends AbstractTransformer {
       return match;
     });
 
-    /* Update or insert the package statement based on `filePath` */
+    /* Ensure the `syntax` statement exists and find its position */
+    const syntaxRegex = /^\s*syntax\s*=\s*["'][^"']+["'];/m;
+    const syntaxMatch = transformedContent.match(syntaxRegex);
+    if (!syntaxMatch) {
+      throw new Error(`ProtobufTransformer: Syntax statement not found in the Protobuf content at ${param.filePath}`);
+    }
+    const syntaxStatement = syntaxMatch[0];
+    const syntaxPosition = transformedContent.indexOf(syntaxStatement);
+    /* Update or insert the package statement immediately after `syntax` */
     const packageName = this.namespaceBuilder(param.filePath);
     const packageRegex = /^\s*package\s+[\w\.]+;/m;
     if (packageRegex.test(transformedContent)) {
+      /* If a package statement exists, replace it */
       transformedContent = transformedContent.replace(packageRegex, `package ${packageName};`);
     } else {
-      transformedContent = `package ${packageName};\n${transformedContent}`;
+      /* Insert the package statement after the syntax field */
+      const beforeSyntax = transformedContent.slice(0, syntaxPosition + syntaxStatement.length);
+      const afterSyntax = transformedContent.slice(syntaxPosition + syntaxStatement.length);
+      transformedContent = `${beforeSyntax}\npackage ${packageName};${afterSyntax}`;
     }
 
     /* Remove package prefix from field type declarations */
