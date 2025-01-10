@@ -14,12 +14,6 @@ Here’s a high-level flow of the schema build and registration process:
 
 The above diagram contains two stages: the **Build Stage** and the **Registration Stage**. These two methods are exposed by the manager class.
 
----
-
-## **Flow of the Registration Process**
-
-The registration process consists of four main steps, each handled by specific components of the Schema Manager:
-
 1. **Versions Extractor**
 
    - **Responsibility**: Extracts version data from the `versions.json` files in a given directory.
@@ -58,17 +52,26 @@ The registration process consists of four main steps, each handled by specific c
 
 ---
 
-## **Extensibility**
+## **Add a New Schema Type**
 
-The **Parser**, **Transformer**, and **Schemas Registry** components are designed to be extended.
+To add a new schema type, you need to create a new configuration in `lib/config`. This will allow users to specify it in the `Manager` instanciation.
 
-- To extend the transformer, follow the guide: [create-transformer.md](create-transformer.md)
-- To extend the parser, follow the guide: [create-parser.md](create-parser.md)
-- To extend the registry, follow the guide: [create-registry.md](create-registry.md)
+Each configuration has to follow the `SchemaTypeConfig` type defined in `lib/config/config.types.ts`. This includes (not exhaustive) a **Transformer** and a **Parser** class.
 
----
+For example, to add a new configuration for Protobuf type, you can add a Configuration named `PROTOBUF`:
+
+```typescript
+    [ConfigType.PROTOBUF]: {
+      transformer: ProtobufTransformer,
+      parser: ProtobufParser,
+    },
+```
+
+Thus, it is possible to create multiple configurations for a given schema types. For instance, you can have multiple different transformers.
 
 ## **Detailed Input Output\***
+
+This section will show the input and output of the different components seen in the diagram above.
 
 Consider a restricted but similar example as the one specified in the [Scenario Example](../README.md#scenario-example) section in the README.
 

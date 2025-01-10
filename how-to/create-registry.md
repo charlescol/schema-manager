@@ -115,6 +115,5 @@ const registry = new ConfluentRegistry({
 });
 await new Manager({
   schemaRegistry: registry,
-  parser: new ProtobufParser(),
-}).loadAll(...);
+});
 ```

@@ -263,7 +263,7 @@ function subjectBuilder(filepath: string): string {
 await manager.register(subjectBuilder); // Register the schemas
 ```
 
-The `subjectBuilder` function generates the subject name for each schema registered in the schema registry. The subject is a unique identifier used by the registry to track a schema.
+The `subjectBuilder` function generates the subject name for each schema registered in the schema registry. The subject is a unique identifier used by the registry to track a schema. The above implementation is a custom strategy but you can also follow a `TopicNameStrategy` or a `RecordNameStrategy` to generate the subject name.
 
 The `register` function builds a dependency graph based on schema dependencies and registers them in the correct order using a topological sorting algorithm.
 
@@ -272,6 +272,8 @@ The `register` function builds a dependency graph based on schema dependencies a
 - `topic1/v1/data.proto` → `topic1.data.v1`
 - `topic1/v1/model.proto` → `topic1.model.v1`
 - `topic1/v2/data.proto` → `topic1.data.v2`
+
+**After the registration process, a `subjects.txt` file is generated in the root directory to keep track of the subjects registered in the schema registry.** This file can be used to generate constants during code generation process.
 
 #### Example of Optimal Registration Order (Based on Dependencies)
 
