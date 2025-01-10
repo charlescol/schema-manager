@@ -4,7 +4,7 @@
     "project": "tsconfig.json",
     "declaration": true,
     "declarationDir": "./dist",
-    "removeComments": true,
+    "removeComments": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
