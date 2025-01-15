@@ -40,7 +40,7 @@ export default class Manager {
   }
 
   /**
-   * The function asynchronously builds a schema using extracted version data and logs a completion
+   * The function asynchronously builds all schemas from the baseDirectory to the buildDir and logs a completion
    * message.
    * @param {string} baseDirectory - The `baseDirectory` parameter in the `build` method is a string that
    * represents the base directory where the build process will take place. It is the starting point or
@@ -56,8 +56,8 @@ export default class Manager {
   }
 
   /**
-   * The `register` function asynchronously registers schemas, builds references, and saves subjects to a
-   * file in TypeScript.
+   * The `register` function asynchronously registers schemas from the buildDir to the schema registry and saves subjects to a
+   * text file.
    * @param subjectBuilder - The `subjectBuilder` parameter is a function that takes a `fullVersionPath`
    * string as input and returns a string.
    * @param buildDir - The `buildDir` parameter in the `register` method is the directory path where the
