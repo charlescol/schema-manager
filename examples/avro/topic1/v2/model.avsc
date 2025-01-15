@@ -5,7 +5,7 @@
   "fields": [
     {
       "name": "data",
-      "type": "common.v1.Data"
+      "type": "Data"
     },
     {
       "name": "description",
@@ -22,7 +22,7 @@
       "name": "entities",
       "type": {
         "type": "array",
-        "items": "common.v1.Entity"
+        "items": "Entity"
       }
     }
   ]

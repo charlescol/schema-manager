@@ -358,6 +358,8 @@ repeated Entity entities = 3; // Internal object names exclude the package name
 }
 ```
 
+**Note:** While the builder will work even if the above conventions are not followed, adhering to them is recommended to reduce unnecessary verbosity and avoid ambiguity.
+
 ---
 
 ### Avro
@@ -384,6 +386,8 @@ repeated Entity entities = 3; // Internal object names exclude the package name
   ]
 }
 ```
+
+**Note:** While the builder will work even if the above conventions are not followed, adhering to them is recommended to reduce unnecessary verbosity and avoid ambiguity.
 
 ---
 
