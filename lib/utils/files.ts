@@ -33,7 +33,7 @@ export function getFiles(dir: string, files: string[] = [], allowedExtensions?: 
 }
 
 /**
- * Lists all files (not directories) in a specified directory.
+ * Lists all files (not directories) in lowercase in a specified directory.
  *
  * @param {string} directoryPath - The path of the directory to list files from.
  * @returns {Promise<string[]>} - A promise that resolves to an array of file names in the directory.
@@ -42,7 +42,7 @@ export function getFiles(dir: string, files: string[] = [], allowedExtensions?: 
 export async function listFilesInDirectory(directoryPath: string): Promise<string[]> {
   try {
     const files = await fs.promises.readdir(directoryPath, { withFileTypes: true });
-    const fileNames = files.filter((file) => file.isFile()).map((file) => file.name);
+    const fileNames = files.filter((file) => file.isFile()).map((file) => file.name.toLowerCase());
     return fileNames;
   } catch (error) {
     console.error(`Error listing files in directory: ${error}`);

@@ -90,10 +90,9 @@ export default abstract class AbstractParser {
           folderFiles.set(relativePath, await listFilesInDirectory(path.dirname(file)));
 
         let dependencies = this.extractDependencies(file);
-        console.log(dependencies);
         const currentFolderFiles = folderFiles.get(relativePath);
         dependencies = dependencies
-          .filter((dep) => currentFolderFiles!.includes(dep))
+          .filter((dep) => currentFolderFiles!.includes(dep.toLowerCase()))
           .map((dep) => {
             const directoryPath = path.dirname(relativePath);
             return path.join(directoryPath.toLowerCase(), dep.toLowerCase());
