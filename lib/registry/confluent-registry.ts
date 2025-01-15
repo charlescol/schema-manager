@@ -5,6 +5,10 @@ import AbstractRegistry from './abstract-registry';
 import { ConfluentRegistryReference } from './types';
 import { DependenciesNameMap } from '../parser/types';
 
+/**
+ * The ConfluentRegistry class extends AbstractRegistry and provides methods for
+ * registering schemas and building references.
+ */
 export default class ConfluentRegistry extends AbstractRegistry<ConfluentRegistryReference> {
   async registerSchema(
     subject: string,
