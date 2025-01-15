@@ -26,7 +26,7 @@ export type SchemaTypeConfig = {
 /**
  * Reference all available configurations
  */
-export declare enum ConfigType {
+export enum ConfigType {
   /**
    * Default configuration for AVRO schemas
    */
