@@ -338,7 +338,7 @@ Many details are dynamically resolved during the build process using the `versio
 ### Protobuf
 
 - **Package Handling**: The package is automatically included during the build process and does not need to be specified in the schema.
-- **Imports**: Import statements should reference only the file name without the full path (e.g., `import "entity.proto";` ✅, not `import "common/v1/entity.proto";` ❌).
+- **Imports**: Import statements should reference only the file name (key specified in the `versions.json` file + `.proto`) without the full path (e.g., `import "entity.proto";` ✅, not `import "common/v1/entity.proto";` ❌).
 - **External Imports**: External imports (e.g., `google/protobuf/timestamp.proto`) remain unchanged.
 - **Object Names**: Internal object references do not need to include the package name (e.g., `Entity` ✅, not `common.v1.Entity` ❌).
 

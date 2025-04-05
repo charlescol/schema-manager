@@ -1,5 +1,4 @@
 {
-  "namespace": "topic1.v2",
   "type": "record",
   "name": "Model",
   "fields": [

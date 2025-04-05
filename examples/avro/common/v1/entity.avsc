@@ -1,5 +1,4 @@
 {
-  "namespace": "common.v1",
   "type": "record",
   "name": "Entity",
   "fields": [
