@@ -1,0 +1,11 @@
+{
+  "v1": {
+    "data": "v1/data.json",
+    "model": "v1/model.json"
+  },
+  "v2": {
+    "data": "v2/data.json",
+    "model": "v1/model.json",
+    "entity": "../common/v1/entity.json"
+  }
+}

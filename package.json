@@ -18,7 +18,8 @@
     "clean": "rm -rf dist",
     "start": "yarn build && yarn ts-node -r tsconfig-paths/register ./lib/main.ts",
     "run:protobuf": "yarn run start --preset=protobuf",
-    "run:avro": "yarn run start --preset=avro"
+    "run:avro": "yarn run start --preset=avro",
+    "run:json": "yarn run start --preset=json"
   },
   "dependencies": {
     "avsc": "^5.7.7",

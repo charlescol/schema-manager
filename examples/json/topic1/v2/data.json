@@ -1,0 +1,15 @@
+{
+  "$id": "https://example.com/topic1/v1/data.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "data",
+  "description": "A data object",
+  "type": "object",
+  "properties": {
+    "additional_info": {
+      "type": "string"
+    },
+    "entity": {
+      "$ref": "entity"
+    }
+  }
+}
