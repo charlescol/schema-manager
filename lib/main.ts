@@ -3,7 +3,7 @@ import * as minimist from 'minimist';
 import ConfluentRegistry from '../dist/registry/confluent-registry';
 import Manager from '../dist/manager/manager';
 import SchemaType from '../dist/types';
-import { ConfigType } from '../dist/config/config.types';
+import { ConfigType } from '../lib/config/config.types';
 
 /*
  * This file is used for running examples in a development environment only;
@@ -56,6 +56,14 @@ import { ConfigType } from '../dist/config/config.types';
       await manager.build(`${SCHEMA_DIR}/avro`);
       break;
     }
+    case SchemaType.JSON: {
+      manager = new Manager({
+        schemaRegistry: registry,
+        configType: ConfigType.JSON,
+      });
+      await manager.build(`${SCHEMA_DIR}/json`);
+      break;
+    }
     default: {
       manager = new Manager({
         schemaRegistry: registry,
@@ -64,7 +72,7 @@ import { ConfigType } from '../dist/config/config.types';
       await manager.build(`${SCHEMA_DIR}/protobuf`);
     }
   }
-  await manager.register(subjectBuilder);
+  //await manager.register(subjectBuilder);
 })();
 
 function subjectBuilder(filepath: string): string {

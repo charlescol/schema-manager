@@ -33,6 +33,7 @@ export default class Builder {
         const content = await fs.readFile(sourceFilePath, 'utf-8');
         const transformedContent = await this.transformer.transform(content, {
           filePath: relativeDir,
+          fileName: path.parse(sourceFilePath).name,
           keys: Array.from(filesMap.keys()),
         });
 

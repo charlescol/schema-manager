@@ -35,4 +35,8 @@ export enum ConfigType {
    * Default configuration for PROTOBUF schemas
    */
   PROTOBUF = 'PROTOBUF',
+  /**
+   * Default configuration for PROTOBUF schemas
+   */
+  JSON = 'JSON',
 }

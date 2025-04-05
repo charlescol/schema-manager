@@ -9,6 +9,7 @@ export default class ProtobufTransformer extends AbstractTransformer {
     this.namespaceBuilder = config.namespaceBuilder || ((filepath: string) => filepath.replace(/\//g, '.'));
   }
   async transform(content: string, param: TransformParameters): Promise<string> {
+    console.log(param.filePath);
     /* Update import statements to use paths relative to `filePath` */
     const importRegex = /import\s+"([^"]+)";/g;
     let transformedContent = content.replace(importRegex, (match, importPath) => {
