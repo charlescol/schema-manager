@@ -72,7 +72,7 @@ import { ConfigType } from '../lib/config/config.types';
       await manager.build(`${SCHEMA_DIR}/protobuf`);
     }
   }
-  //await manager.register(subjectBuilder);
+  await manager.register(subjectBuilder);
 })();
 
 function subjectBuilder(filepath: string): string {

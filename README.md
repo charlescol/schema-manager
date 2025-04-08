@@ -49,6 +49,7 @@ The minimal requirement is to initiate an npm project within your repository and
 | ------------ | --------------------- | ------------------------------------------------------------------------------------------ |
 | **Avro**     | `.avro`, `.avsc`      | Parses Avro schema files, supports extracting dependencies from `.avro` and `.avsc` files. |
 | **Protobuf** | `.proto`              | Parses Protobuf schema files, supports extracting dependencies from `.proto` files.        |
+| **Json**     | `.json`               | Parses JSON schema files, supports extracting dependencies from `.json` files.             |
 
 Please refer to the [Parser Documentation](how-to/create-parser.md) for more details on how to create a parser.
 
@@ -358,14 +359,12 @@ repeated Entity entities = 3; // Internal object names exclude the package name
 }
 ```
 
-**Note:** While the builder will work even if the above conventions are not followed, adhering to them is recommended to reduce unnecessary verbosity and avoid ambiguity.
-
 ---
 
 ### Avro
 
 - **Namespace Handling**: Namespaces are automatically included during the build process and do not need to be specified in the schema.
-- **Object Names**: Internal object references do not need to include the namespace name (e.g., `Entity` ✅, not `common.v1.Entity` ❌).
+- **Object Names**: Object references do not need to include the namespace name (e.g., `Entity` ✅, not `common.v1.Entity` ❌).
 
 ```json
 {
@@ -387,7 +386,35 @@ repeated Entity entities = 3; // Internal object names exclude the package name
 }
 ```
 
-**Note:** While the builder will work even if the above conventions are not followed, adhering to them is recommended to reduce unnecessary verbosity and avoid ambiguity.
+---
+
+### Json
+
+- **Id Handling**: Ids are automatically included (based on the relative file path) during the build process and do not need to be specified in the schema.
+- **Object Names**: Object references do not need to include the namespace name (e.g., `data` ✅, not `topic1.v2.data` ❌).
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "model",
+  "description": "A model object",
+  "type": "object",
+  "properties": {
+    "data": {
+      "$ref": "data"
+    },
+    "description": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
+```
 
 ---
 

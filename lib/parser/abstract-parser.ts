@@ -35,7 +35,7 @@ export default abstract class AbstractParser {
    * (without the file path). The result is case-insensitive.
    *
    * @param {string} filePath - The path to the file from which to extract dependencies.
-   * @returns {string[]} - An array of dependency names (without extensions or paths), that the file relies on.
+   * @returns {string[]} - An array of dependency names (without paths), that the file relies on.
    */
   protected abstract extractDependencies(filePath: string): string[];
   /**
