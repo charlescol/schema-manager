@@ -43,10 +43,6 @@ For a more comprehensive explanation of how Schema Manager integrates into moder
 
 ## Table of Contents
 
-- [Centralize Your Schema Files in One Git Repository](#centralize-your-schema-files-in-one-git-repository)
-- [You might find it useful if](#you-might-find-it-useful-if)
-- [What Does It Do?](#what-does-it-do)
-- [Introduction](#introduction)
 - [Quick Start](#quick-start)
 - [Supported Schema Formats](#supported-schema-formats)
 - [Available Registries](#available-registries)
