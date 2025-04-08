@@ -5,14 +5,26 @@
 ![npm downloads](https://img.shields.io/npm/dm/@charlescol/schema-manager)
 ![License](https://img.shields.io/github/license/charlescol/schema-manager)
 
-### Why Schema Manager?
+## You might find it useful if:
 
-- Centralize schema files (Avro, Protobuf, JSON) in a single **Git repository**.
-- Integrate schema deployment to the **Schema Registry** and automate model generation and distribution in a centralized **CI/CD pipeline**.
-- Automate schema transformations.
-- Resolve schema dependencies in JSON configurations to eliminate redundancy and improve maintainability.
+- You’re maintaining schema files (Protobuf, Avro, JSON) across multiple services or repositories
+- Some of these schemas depend on each other, and managing those dependencies manually has become error-prone
+- You want to avoid redundancy, and track versions cleanly through Git
+- You need to publish schemas to a registry (e.g., Confluent) as part of your CI/CD
+- You’re looking for a lightweight solution — no GitOps, no operators, no Maven plugins
 
-**Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)  
+---
+
+## What Does It Do?
+
+**Schema Manager** is a Node.js-based CLI and SDK that:
+
+- Resolves dependencies explicitly using a versions.json file, avoiding duplication across versions
+- Applies topological sorting on the dependency graph to publish in the correct order
+- Applies schema transformations (e.g., injecting packages, resolving import paths)
+- Publishes schemas to a supported registry (currently: **Confluent Schema Registry**)
+
+**Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)
 **Guide**: [Scenario Example](#scenario-example)
 
 ---
