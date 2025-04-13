@@ -469,7 +469,7 @@ We aim to extend Schema Manager with the following features:
 
 ## Example of Typical Integration with Schema Manager
 
-In a Kubernetes-based architecture, managing schema files doesn’t need to be overengineered.
+Managing schema files doesn’t need to be overengineered.
 
 Just keep your schemas in a Git repository (shared or dedicated),
 trigger a CI/CD pipeline when changes are made (e.g., on tag or PR merge),
