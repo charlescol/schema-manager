@@ -90,7 +90,7 @@ The minimal requirement is to initiate an npm project within your repository and
 | **Protobuf** | `.proto`              | Parses Protobuf schema files, supports extracting dependencies from `.proto` files.        |
 | **Json**     | `.json`               | Parses JSON schema files, supports extracting dependencies from `.json` files.             |
 
-Please refer to the [Parser Documentation](how-to/create-parser.md) for more details on how to create a parser.
+Please refer to the [Parser Documentation](how-to/create-parser.md) for more details on how to contribute and create a parser.
 
 ---
 
@@ -100,7 +100,7 @@ Please refer to the [Parser Documentation](how-to/create-parser.md) for more det
 | ----------------------------- | ------------------- | ------------------------ |
 | **Confluent Schema Registry** | `ConfluentRegistry` | Confluent Kafka          |
 
-Please refer to the [Registry Documentation](how-to/create-registry.md) for more details on how to create a registry.
+Please refer to the [Registry Documentation](how-to/create-registry.md) for more details on how to contribute and create a registry.
 
 ---
 
