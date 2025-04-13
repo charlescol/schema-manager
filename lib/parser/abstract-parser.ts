@@ -95,7 +95,7 @@ export default abstract class AbstractParser {
           .filter((dep) => currentFolderFiles!.includes(dep.toLowerCase()))
           .map((dep) => {
             const directoryPath = path.dirname(relativePath);
-            return path.join(directoryPath, dep);
+            return path.join(directoryPath, dep.toLowerCase());
           });
         dependenciesNameMap.set(relativePath, this.extractName(file));
         dependenciesMap.set(relativePath, dependencies);

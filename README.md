@@ -192,7 +192,7 @@ Adding a `versions.json` in the `common` directory is unnecessary because it is 
 ### Additional Remarks
 
 - Schema Manager supports any string for version names (e.g., `v1`, `v1.0`, `alpha`).
-- The schema name must be unique across a given version of a topic.
+- The schema name must be unique (case insensitive) across a given version of a topic.
 - Alternatively, a single `versions.json` file could be used to manage all the topics centrally.
 
 **Note:** Multiple examples, including those mentioned here with different schema types (Protobuf, Avro, etc.), can be found in the repository at `./examples`. Explore these to better understand schema management workflows.
