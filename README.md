@@ -78,6 +78,11 @@ npm install @charlescol/schema-manager
 
 The minimal requirement is to initiate an npm project within your repository and install the package. The schema manager capabilities can be used programmatically in a JavaScript script file (example [here](#full-code)).
 
+```bash
+mkdir schema-manager-example && cd schema-manager-example # Create the folder
+npm init -y && npm install @charlescol/schema-manager # Initiate the project with the Schema-Manager package
+```
+
 **Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)
 
 ---
