@@ -1,3 +1,6 @@
+
+**This how-to section is intended for contributors who wish to extend the project with support for new types of schemas, schema registries, or configurations.**
+
 # Schema Manager Overview
 
 The Schema Manager is a tool designed to handle the registration of schemas within a schema registry service. It employs an **Orchestrator Pattern**, where the **Manager** class acts as the conductor, ensuring that schema dependencies are resolved, and schemas are registered in the correct sequence.
