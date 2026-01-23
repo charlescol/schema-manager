@@ -7,37 +7,49 @@
 
 ## You might find it useful if:
 
-- You’re maintaining schema files (Protobuf, Avro, JSON) across multiple services or repositories
-- Some of these schemas depend on each other, and managing those dependencies manually has become error-prone
-- You want to avoid redundancy, and track versions cleanly through Git
+- You are maintaining schema files (Protobuf, Avro, JSON) across multiple services or repositories
+- Some of these schemas depend on each other, and managing those dependencies manually has become error prone
+
+- You operate under a **strict compatibility policy**
+- Some evolutions are **not backward compatible**, so you **cannot publish them as a new version of the same subject**
+- In that case you typically create
+  - a **new subject**
+  - often a **new topic**
+  - therefore a **new set of schemas** (a new contract family)
+- You want to avoid redundancy and silent divergence
+  - unchanged files copied into multiple folders
+  - shared entities duplicated everywhere
+  - divergence that goes unnoticed until runtime
+- You need a **deterministic build and registration process** so what gets registered is exactly what you intended
 - You need to publish schemas to a registry (e.g., Confluent) as part of your CI/CD
-- You’re looking for a lightweight solution — no GitOps, no operators, no Maven plugins
+- You’re looking for a lightweight solution with no GitOps, no operators, no Maven plugins
 
 ---
 
 ## What Does It Do?
 
-**Schema Manager** is a Node.js-based CLI and SDK that:
+**Schema Manager** is a Node.js based CLI and SDK that helps you manage **schema sets** as **organizational and functional versions** (e.g., v1, v2, etc.) and not as “Schema Registry versions”.
 
-- Resolves dependencies explicitly using a versions.json file, avoiding duplication across versions
+It targets the real world case where strict compatibility rules force you to create **incompatible contracts** (new subject, often new topic), and the core problems become
+
+- redundancy (copy and paste of unchanged files across versions)
+- build complexity (imports, dependency closure, ordering)
+- deployment reliability (avoiding accidental upgrades, freezing the exact graph registered)
+
+Schema Manager then:
+
+- Resolves dependencies explicitly using a `versions.json` file, avoiding duplication across versions
+- Structures contract families (`v1`, `v2`, etc.) by reusing unchanged files instead of duplicating them
+- Builds a deterministic, reproducible artifact (`build/`) that represents the exact schema graph you want
 - Applies topological sorting on the dependency graph to publish in the correct order
 - Applies schema transformations (e.g., injecting packages, resolving import paths)
 - Publishes schemas to a supported registry (currently: **Confluent Schema Registry**)
 
-**Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)
+**The Schema Registry remains the single source of truth for schema versions.**  
+Schema Manager is about preparing and deploying **incompatible subjects and contracts cleanly**, with less duplication and fewer deployment risks.
+
+**Sample Repo Demo**: [Try the example here in just a few minutes.](https://github.com/charlescol/schema-manager-example)  
 **Guide**: [Scenario Example](#scenario-example)
-
----
-
-### Introduction
-
-In modern microservices architectures, separating concerns is essential for achieving scalability and maintainability. Managing schema files (e.g., Avro, Protobuf, JSON) across multiple services can quickly become complex and error-prone, especially when each microservice maintains its own schemas and handles their publication to a schema registry (e.g., Confluent Schema Registry).
-
-**Schema Manager** addresses these challenges by centralizing schema management and delegation. It maintains schema files in a centralized Git repository and handles deployment to the target Schema Registry (typically through a CI/CD pipeline).
-
-By enforcing this separation of concerns, Schema Manager simplifies schema management across services and ensures **a clear separation of responsibilities**, allowing microservices to remain lightweight and focused.
-
-For a more comprehensive explanation of how Schema Manager integrates into modern Kafka-oriented applications involving multiple microservices and languages, refer to the [Example of Integration with Schema Manager](#example-of-integration-with-schema-manager) section. This section covers schema publication, as well as the generation and distribution of models across services.
 
 ---
 
@@ -112,15 +124,12 @@ Please refer to the [Registry Documentation](how-to/create-registry.md) for more
 ### How It Works
 
 1. **Organize Your Schemas:**
-
    - Place your files in versioned directories (e.g., `v1`, `v2`) and map them in `versions.json`. Refer to the [versions file structure](#versions-file-structure) for details on how to structure the `versions.json` file.
 
 2. **Build Schemas:**
-
    - Schema Manager produces a `build` directory with all the schemas grouped into folders. Each folder contains the transformed schema with the appropriate namespaces and dependencies.
 
 3. **Automated Registration:**
-
    - Schema Manager processes the `build` folder to register the schemas in the target Schema Registry in the correct order based on dependencies.
 
 ## Scenario Example
