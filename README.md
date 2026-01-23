@@ -9,7 +9,6 @@
 
 - You are maintaining schema files (Protobuf, Avro, JSON) across multiple services or repositories
 - Some of these schemas depend on each other, and managing those dependencies manually has become error prone
-
 - You operate under a **strict compatibility policy**
 - Some evolutions are **not backward compatible**, so you **cannot publish them as a new version of the same subject**
 - In that case you typically create
